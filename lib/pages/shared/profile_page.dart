@@ -23,11 +23,78 @@ class _ProfilePageState extends State<ProfilePage> {
   final _phone = TextEditingController();
   XFile? _picked;
   bool _saving = false;
+  
+  // Stats data
+  int _favoriteCount = 0;
+  int _bookingCount = 0;
+  // Owner stats
+  int _totalKos = 0;
+  int _totalBookings = 0;
+  double _avgRating = 0.0;
+  bool _loadingStats = true;
 
   @override
   void initState() {
     super.initState();
     _future = _api.getProfile();
+    _loadStats();
+  }
+
+  Future<void> _loadStats() async {
+    try {
+      setState(() => _loadingStats = true);
+      
+      // Get user role first
+      final user = await _api.getProfile();
+      
+      if (user.role == 'society') {
+        // Load favorites count (for society users)
+        try {
+          final favorites = await _api.getFavorites();
+          _favoriteCount = favorites.length;
+        } catch (e) {
+          _favoriteCount = 0;
+        }
+        
+        // Load bookings count
+        try {
+          final bookings = await _api.getBookings();
+          _bookingCount = bookings.length;
+        } catch (e) {
+          _bookingCount = 0;
+        }
+      } else if (user.role == 'owner' || user.role == 'admin') {
+        // Load owner stats from analytics
+        try {
+          print('DEBUG ProfilePage: Loading analytics for owner...');
+          final analytics = await _api.getAnalytics();
+          print('DEBUG ProfilePage: Analytics response: $analytics');
+          
+          final overview = analytics['overview'] as Map<String, dynamic>?;
+          print('DEBUG ProfilePage: Overview: $overview');
+          
+          if (overview != null) {
+            _totalKos = (overview['total_kos'] as num?)?.toInt() ?? 0;
+            _totalBookings = (overview['total_bookings'] as num?)?.toInt() ?? 0;
+            _avgRating = (overview['avg_rating'] as num?)?.toDouble() ?? 0.0;
+            print('DEBUG ProfilePage: Stats loaded - Kos: $_totalKos, Bookings: $_totalBookings, Rating: $_avgRating');
+          } else {
+            print('DEBUG ProfilePage: Overview is null');
+          }
+        } catch (e) {
+          print('DEBUG ProfilePage: Error loading analytics: $e');
+          _totalKos = 0;
+          _totalBookings = 0;
+          _avgRating = 0.0;
+        }
+      }
+    } catch (e) {
+      // Ignore errors, use default values
+    } finally {
+      if (mounted) {
+        setState(() => _loadingStats = false);
+      }
+    }
   }
 
   @override
@@ -101,8 +168,13 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
 
-              // Profile Stats
-              SliverToBoxAdapter(child: _buildStatsSection()),
+              // Profile Stats (for society users)
+              if (user.role == 'society')
+                SliverToBoxAdapter(child: _buildStatsSection()),
+
+              // Owner Stats (for owner/admin users)
+              if (user.role == 'admin' || user.role == 'owner')
+                SliverToBoxAdapter(child: _buildOwnerStatsSection()),
 
               // Admin Section (if user is admin/owner)
               if (user.role == 'admin' || user.role == 'owner')
@@ -197,36 +269,126 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ],
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: _buildStatItem(
-              icon: Icons.home_rounded,
-              label: 'Kos Favorit',
-              value: '12',
-              color: const Color(0xFF6E473B),
+      child: _loadingStats
+          ? const Center(
+              child: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: CircularProgressIndicator(
+                  color: Color(0xFF6E473B),
+                  strokeWidth: 2,
+                ),
+              ),
+            )
+          : Row(
+              children: [
+                Expanded(
+                  child: _buildStatItem(
+                    icon: Icons.favorite_rounded,
+                    label: 'Kos Favorit',
+                    value: '$_favoriteCount',
+                    color: const Color(0xFF6E473B),
+                  ),
+                ),
+                Container(width: 1, height: 40, color: const Color(0xFFE1D4C2)),
+                Expanded(
+                  child: _buildStatItem(
+                    icon: Icons.receipt_long_rounded,
+                    label: 'Total Booking',
+                    value: '$_bookingCount',
+                    color: const Color(0xFFA78D78),
+                  ),
+                ),
+              ],
             ),
-          ),
-          Container(width: 1, height: 40, color: const Color(0xFFE1D4C2)),
-          Expanded(
-            child: _buildStatItem(
-              icon: Icons.receipt_long_rounded,
-              label: 'Total Booking',
-              value: '8',
-              color: const Color(0xFFA78D78),
-            ),
-          ),
-          Container(width: 1, height: 40, color: const Color(0xFFE1D4C2)),
-          Expanded(
-            child: _buildStatItem(
-              icon: Icons.star_rounded,
-              label: 'Rating',
-              value: '4.8',
-              color: Colors.amber,
-            ),
+    );
+  }
+
+  Widget _buildOwnerStatsSection() {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
           ),
         ],
       ),
+      child: _loadingStats
+          ? const Center(
+              child: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: CircularProgressIndicator(
+                  color: Color(0xFF6E473B),
+                  strokeWidth: 2,
+                ),
+              ),
+            )
+          : Row(
+              children: [
+                Expanded(
+                  child: _buildStatItem(
+                    icon: Icons.home_rounded,
+                    label: 'Total Kos',
+                    value: '$_totalKos',
+                    color: const Color(0xFF6E473B),
+                  ),
+                ),
+                Container(width: 1, height: 40, color: const Color(0xFFE1D4C2)),
+                Expanded(
+                  child: _buildStatItem(
+                    icon: Icons.receipt_long_rounded,
+                    label: 'Total Booking',
+                    value: '$_totalBookings',
+                    color: const Color(0xFFA78D78),
+                  ),
+                ),
+                Container(width: 1, height: 40, color: const Color(0xFFE1D4C2)),
+                Expanded(
+                  child: _buildStatItem(
+                    icon: Icons.star_rounded,
+                    label: 'Rating',
+                    value: _avgRating > 0 ? _avgRating.toStringAsFixed(1) : '0.0',
+                    color: Colors.amber,
+                  ),
+                ),
+              ],
+            ),
+    );
+  }
+
+  Widget _buildStatItem({
+    required IconData icon,
+    required String label,
+    required String value,
+    required Color color,
+  }) {
+    return Column(
+      children: [
+        Icon(icon, color: color, size: 24),
+        const SizedBox(height: 8),
+        Text(
+          value,
+          style: GoogleFonts.poppins(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: const Color(0xFF291C0E),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: GoogleFonts.poppins(
+            fontSize: 12,
+            color: const Color(0xFF291C0E).withOpacity(0.6),
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
     );
   }
 
@@ -310,14 +472,20 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           _buildDivider(),
           _buildAdminItem(
+            icon: Icons.room_preferences_rounded,
+            title: 'Kelola Facility',
+            subtitle: 'Kelola facilities untuk kos Anda',
+            onTap: () {
+              Navigator.of(context).pushNamed('/facility_management');
+            },
+          ),
+          _buildDivider(),
+          _buildAdminItem(
             icon: Icons.analytics_rounded,
             title: 'Analytics',
             subtitle: 'Lihat statistik dan laporan',
             onTap: () {
-              _showComingSoonDialog(
-                'Analytics',
-                'Fitur Analytics akan segera hadir!',
-              );
+              Navigator.of(context).pushNamed('/analytics');
             },
           ),
           _buildDivider(),
@@ -373,37 +541,6 @@ class _ProfilePageState extends State<ProfilePage> {
         size: 16,
       ),
       onTap: onTap,
-    );
-  }
-
-  Widget _buildStatItem({
-    required IconData icon,
-    required String label,
-    required String value,
-    required Color color,
-  }) {
-    return Column(
-      children: [
-        Icon(icon, color: color, size: 24),
-        const SizedBox(height: 8),
-        Text(
-          value,
-          style: GoogleFonts.poppins(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: const Color(0xFF291C0E),
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: GoogleFonts.poppins(
-            fontSize: 12,
-            color: const Color(0xFF291C0E).withOpacity(0.6),
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ],
     );
   }
 

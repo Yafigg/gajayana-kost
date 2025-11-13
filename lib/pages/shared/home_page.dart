@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui';
+import 'dart:async';
 import 'package:shimmer/shimmer.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -148,225 +149,249 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       backgroundColor: Colors.white, // Background putih
-      body: CustomScrollView(
-        slivers: [
-          // Personal Header with Greeting
-          SliverAppBar(
-            expandedHeight: 100,
-            floating: false,
-            pinned: true,
-            snap: false,
-            backgroundColor: Colors.white,
-            elevation: 0,
-            leading: null,
-            automaticallyImplyLeading: false,
-            flexibleSpace: FlexibleSpaceBar(
-              centerTitle: false,
-              titlePadding: const EdgeInsets.only(
-                left: 20,
-                bottom: 14,
-                right: 20,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(110),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            bottomLeft: Radius.circular(30),
+            bottomRight: Radius.circular(30),
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  const Color(0xFF6E473B),
+                  const Color(0xFF8B6F5E),
+                  const Color(0xFF6E473B),
+                ],
+                stops: const [0.0, 0.5, 1.0],
               ),
-              title: Row(
-                children: [
-                  // Greeting & Date
-                  Flexible(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
+                ),
+                child: Row(
+                  children: [
+                    // Greeting & Date
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            _userName != null
+                                ? '${_getGreeting()}, ${_userName!.split(' ').first}'
+                                : 'Selamat Datang',
+                            style: GoogleFonts.poppins(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                              letterSpacing: -0.1,
+                              height: 1.2,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            _getFormattedDate(),
+                            style: GoogleFonts.poppins(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.white.withOpacity(0.95),
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    // Actions
+                    Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          _userName != null
-                              ? '${_getGreeting()}, ${_userName!.split(' ').first}'
-                              : 'Selamat Datang',
-                          style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: const Color(0xFF291C0E),
-                            letterSpacing: -0.1,
-                            height: 1.2,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          _getFormattedDate(),
-                          style: GoogleFonts.poppins(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w400,
-                            color: const Color(0xFF291C0E).withOpacity(0.6),
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  // Actions
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Notification
-                      Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(12),
-                          onTap: () {
-                            // TODO: Navigate to notifications
-                          },
-                          child: Container(
-                            width: 28,
-                            height: 28,
-                            margin: const EdgeInsets.only(right: 6),
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade50,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Stack(
-                              clipBehavior: Clip.none,
-                              children: [
-                                Center(
-                                  child: Icon(
-                                    Icons.notifications_outlined,
-                                    color: Colors.grey.shade700,
-                                    size: 14,
-                                  ),
+                        // Notification
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(12),
+                            onTap: () {
+                              // TODO: Navigate to notifications
+                            },
+                            child: Container(
+                              width: 40,
+                              height: 40,
+                              margin: const EdgeInsets.only(right: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.25),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.3),
+                                  width: 1,
                                 ),
-                                Positioned(
-                                  top: 4,
-                                  right: 4,
-                                  child: Container(
-                                    width: 5,
-                                    height: 5,
-                                    decoration: BoxDecoration(
-                                      color: Colors.red.shade500,
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color: Colors.white,
-                                        width: 1,
-                                      ),
+                              ),
+                              child: Stack(
+                                clipBehavior: Clip.none,
+                                children: [
+                                  Center(
+                                    child: Icon(
+                                      Icons.notifications_outlined,
+                                      color: Colors.white,
+                                      size: 20,
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      // Three Dots Menu (for Add Kos and other actions)
-                      if (_userRole == 'owner' || _userRole == 'admin')
-                        PopupMenuButton<String>(
-                          icon: Container(
-                            width: 28,
-                            height: 28,
-                            margin: const EdgeInsets.only(right: 6),
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade50,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Icon(
-                              Icons.more_vert,
-                              color: Colors.grey.shade700,
-                              size: 14,
-                            ),
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          onSelected: (value) async {
-                            if (value == 'add_kos') {
-                              final result = await Navigator.of(
-                                context,
-                              ).pushNamed('/add_kos');
-                              if (result == true) {
-                                _reload();
-                              }
-                            }
-                          },
-                          itemBuilder: (context) => [
-                            PopupMenuItem<String>(
-                              value: 'add_kos',
-                              child: Row(
-                                children: [
-                                  const Icon(
-                                    Icons.add_rounded,
-                                    color: Color(0xFF6E473B),
-                                    size: 20,
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Text(
-                                    'Tambah Kos',
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      color: const Color(0xFF291C0E),
+                                  Positioned(
+                                    top: 6,
+                                    right: 6,
+                                    child: Container(
+                                      width: 8,
+                                      height: 8,
+                                      decoration: BoxDecoration(
+                                        color: Colors.red.shade500,
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: const Color(0xFF6E473B),
+                                          width: 1.5,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                          ],
-                        ),
-                      // Avatar
-                      Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(20),
-                          onTap: () {
-                            Navigator.of(context).pushNamed('/profile');
-                          },
-                          child: Container(
-                            width: 28,
-                            height: 28,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: Colors.grey.shade300,
-                                width: 1,
-                              ),
-                            ),
-                            child: _userAvatar != null
-                                ? ClipOval(
-                                    child: CachedNetworkImage(
-                                      imageUrl:
-                                          '$storageBaseUrl/${_userAvatar!}',
-                                      fit: BoxFit.cover,
-                                      errorWidget: (context, url, error) =>
-                                          Icon(
-                                            Icons.person,
-                                            color: Colors.grey.shade400,
-                                            size: 16,
-                                          ),
-                                    ),
-                                  )
-                                : Icon(
-                                    Icons.person,
-                                    color: Colors.grey.shade400,
-                                    size: 16,
-                                  ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              background: Container(
-                decoration: const BoxDecoration(color: Colors.white),
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(color: Colors.grey.shade200, width: 1),
+                        // Three Dots Menu (for Add Kos and other actions)
+                        if (_userRole == 'owner' || _userRole == 'admin')
+                          PopupMenuButton<String>(
+                            icon: Container(
+                              width: 40,
+                              height: 40,
+                              margin: const EdgeInsets.only(right: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.25),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.3),
+                                  width: 1,
+                                ),
+                              ),
+                              child: const Icon(
+                                Icons.more_vert,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            color: Colors.white,
+                            onSelected: (value) async {
+                              if (value == 'add_kos') {
+                                final result = await Navigator.of(
+                                  context,
+                                ).pushNamed('/add_kos');
+                                if (result == true) {
+                                  _reload();
+                                }
+                              }
+                            },
+                            itemBuilder: (context) => [
+                              PopupMenuItem<String>(
+                                value: 'add_kos',
+                                child: Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.add_rounded,
+                                      color: Color(0xFF6E473B),
+                                      size: 20,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Text(
+                                      'Tambah Kos',
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        color: const Color(0xFF291C0E),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        // Avatar
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(20),
+                            onTap: () {
+                              Navigator.of(context).pushNamed('/profile');
+                            },
+                            child: Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.4),
+                                  width: 2,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: _userAvatar != null
+                                  ? ClipOval(
+                                      child: CachedNetworkImage(
+                                        imageUrl:
+                                            '$storageBaseUrl/${_userAvatar!}',
+                                        fit: BoxFit.cover,
+                                        errorWidget: (context, url, error) =>
+                                            const Icon(
+                                              Icons.person,
+                                              color: Colors.white,
+                                              size: 20,
+                                            ),
+                                      ),
+                                    )
+                                  : const Icon(
+                                      Icons.person,
+                                      color: Colors.white,
+                                      size: 20,
+                                    ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
+                  ],
                 ),
               ),
             ),
-            actions: const [],
           ),
-
+        ),
+      ),
+      body: CustomScrollView(
+        slivers: [
           // Search Section
           SliverToBoxAdapter(
             child: _SearchSection(
@@ -435,8 +460,10 @@ class _HomePageState extends State<HomePage> {
           else
             SliverToBoxAdapter(
               child: Container(
-                height: 400, // Fixed height untuk carousel
-                margin: const EdgeInsets.only(bottom: 24),
+                height:
+                    420, // Fixed height untuk carousel (dinaikkan untuk mencegah terpotong)
+                margin: const EdgeInsets.only(bottom: 32),
+                padding: const EdgeInsets.only(bottom: 24),
                 child: _CarouselWithEffect(
                   items: _items,
                   onTap: (kos) => _navigateToDetail(kos),
@@ -943,6 +970,15 @@ class _ModernKosCard extends StatelessWidget {
 
   const _ModernKosCard({required this.kos, required this.onTap});
 
+  String _formatPrice(double price) {
+    if (price >= 1000000) {
+      return '${(price / 1000000).toStringAsFixed(1)}M';
+    } else if (price >= 1000) {
+      return '${(price / 1000).toStringAsFixed(0)}K';
+    }
+    return price.toStringAsFixed(0);
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
@@ -1020,7 +1056,7 @@ class _ModernKosCard extends StatelessWidget {
             Expanded(
               flex: 2,
               child: Padding(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.fromLTRB(12, 12, 12, 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -1062,7 +1098,9 @@ class _ModernKosCard extends StatelessWidget {
                         Icon(Icons.star_rounded, size: 14, color: Colors.amber),
                         const SizedBox(width: 4),
                         Text(
-                          '4.5',
+                          kos.averageRating != null && kos.averageRating! > 0
+                              ? kos.averageRating!.toStringAsFixed(1)
+                              : '0.0',
                           style: GoogleFonts.poppins(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
@@ -1071,7 +1109,9 @@ class _ModernKosCard extends StatelessWidget {
                         ),
                         const Spacer(),
                         Text(
-                          'Rp 1.2M',
+                          kos.price != null
+                              ? 'Rp ${_formatPrice(kos.price!)}'
+                              : '-',
                           style: GoogleFonts.poppins(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
@@ -1096,6 +1136,15 @@ class _ModernKosCardList extends StatelessWidget {
   final VoidCallback onTap;
 
   const _ModernKosCardList({required this.kos, required this.onTap});
+
+  String _formatPrice(double price) {
+    if (price >= 1000000) {
+      return '${(price / 1000000).toStringAsFixed(1)}M';
+    } else if (price >= 1000) {
+      return '${(price / 1000).toStringAsFixed(0)}K';
+    }
+    return price.toStringAsFixed(0);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1150,7 +1199,7 @@ class _ModernKosCardList extends StatelessWidget {
             // Content
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.fromLTRB(12, 12, 12, 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -1192,7 +1241,9 @@ class _ModernKosCardList extends StatelessWidget {
                         Icon(Icons.star_rounded, size: 16, color: Colors.amber),
                         const SizedBox(width: 4),
                         Text(
-                          '4.5',
+                          kos.averageRating != null && kos.averageRating! > 0
+                              ? kos.averageRating!.toStringAsFixed(1)
+                              : '0.0',
                           style: GoogleFonts.poppins(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
@@ -1201,7 +1252,9 @@ class _ModernKosCardList extends StatelessWidget {
                         ),
                         const Spacer(),
                         Text(
-                          'Rp 1.2M',
+                          kos.price != null
+                              ? 'Rp ${_formatPrice(kos.price!)}'
+                              : '-',
                           style: GoogleFonts.poppins(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -1570,7 +1623,7 @@ class _CarouselWithEffectState extends State<_CarouselWithEffect> {
                 curve: Curves.easeInOut,
                 margin: EdgeInsets.symmetric(
                   horizontal: isActive ? 8 : 16,
-                  vertical: isActive ? 0 : 20,
+                  vertical: isActive ? 4 : 16,
                 ),
                 child: Transform.scale(
                   scale: isActive ? 1.0 : 0.9,
@@ -1584,11 +1637,10 @@ class _CarouselWithEffectState extends State<_CarouselWithEffect> {
             },
           ),
         ),
-
-        // Page Indicators
+        // Page Indicators di bawah carousel (fixed, tidak ikut bergeser)
         if (widget.items.length > 1)
-          Container(
-            margin: const EdgeInsets.only(top: 16),
+          Padding(
+            padding: const EdgeInsets.only(top: 30, bottom: 4),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(
@@ -1624,6 +1676,15 @@ class _HorizontalKosCard extends StatelessWidget {
     required this.isActive,
     required this.onTap,
   });
+
+  String _formatPrice(double price) {
+    if (price >= 1000000) {
+      return '${(price / 1000000).toStringAsFixed(1)}M';
+    } else if (price >= 1000) {
+      return '${(price / 1000).toStringAsFixed(0)}K';
+    }
+    return price.toStringAsFixed(0);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1721,7 +1782,7 @@ class _HorizontalKosCard extends StatelessWidget {
             Expanded(
               flex: 2,
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -1770,7 +1831,9 @@ class _HorizontalKosCard extends StatelessWidget {
                         Icon(Icons.star_rounded, size: 16, color: Colors.amber),
                         const SizedBox(width: 4),
                         Text(
-                          '4.5',
+                          kos.averageRating != null && kos.averageRating! > 0
+                              ? kos.averageRating!.toStringAsFixed(1)
+                              : '0.0',
                           style: GoogleFonts.poppins(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
@@ -1779,7 +1842,9 @@ class _HorizontalKosCard extends StatelessWidget {
                         ),
                         const Spacer(),
                         Text(
-                          'Rp 1.2M',
+                          kos.price != null
+                              ? 'Rp ${_formatPrice(kos.price!)}'
+                              : '-',
                           style: GoogleFonts.poppins(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -1821,6 +1886,12 @@ class _KosDetailPageState extends State<KosDetailPage> {
     super.initState();
     _future = _api.getKosDetail(widget.kosId);
     _checkUserRole();
+  }
+
+  Future<void> _refreshKosDetail() async {
+    setState(() {
+      _future = _api.getKosDetail(widget.kosId);
+    });
   }
 
   Future<void> _checkUserRole() async {
@@ -2058,6 +2129,781 @@ class _KosDetailPageState extends State<KosDetailPage> {
     }
   }
 
+  Future<void> _showAddReviewDialog(BuildContext context, int kosId) async {
+    await showDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.6),
+      builder: (dialogContext) => _AddReviewDialog(
+        kosId: kosId,
+        parentContext: context, // Pass parent context
+        onReviewAdded: () {
+          _refreshKosDetail();
+        },
+      ),
+    );
+  }
+
+  Future<void> _showEditReviewDialog(
+    BuildContext context,
+    int reviewId,
+    String currentComment,
+    int currentRating,
+  ) async {
+    final commentController = TextEditingController(text: currentComment);
+    int selectedRating = currentRating;
+
+    await showDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.6),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => Dialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: Container(
+            constraints: BoxConstraints(
+              maxWidth: 400,
+              maxHeight: MediaQuery.of(context).size.height * 0.9,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(28),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.15),
+                  blurRadius: 30,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            const Color(0xFF6E473B),
+                            const Color(0xFF8B6F5E),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.edit_rounded,
+                            color: Colors.white,
+                            size: 24,
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            'Edit Ulasan',
+                            style: GoogleFonts.poppins(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    // Rating
+                    Text(
+                      'Rating',
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF291C0E),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: List.generate(5, (index) {
+                        final rating = index + 1;
+                        return GestureDetector(
+                          onTap: () =>
+                              setDialogState(() => selectedRating = rating),
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: Icon(
+                              rating <= selectedRating
+                                  ? Icons.star_rounded
+                                  : Icons.star_outline_rounded,
+                              color: rating <= selectedRating
+                                  ? Colors.amber
+                                  : Colors.grey.shade300,
+                              size: 32,
+                            ),
+                          ),
+                        );
+                      }),
+                    ),
+                    const SizedBox(height: 20),
+                    // Comment
+                    Text(
+                      'Komentar',
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF291C0E),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: commentController,
+                      maxLines: 4,
+                      decoration: InputDecoration(
+                        hintText: 'Tulis ulasan Anda...',
+                        filled: true,
+                        fillColor: Colors.grey.shade50,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Colors.grey.shade300),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Colors.grey.shade300),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Color(0xFF6E473B),
+                            width: 2,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    // Buttons
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () => Navigator.pop(context),
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              side: BorderSide(color: Colors.grey.shade300),
+                            ),
+                            child: Text(
+                              'Batal',
+                              style: GoogleFonts.poppins(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey.shade700,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              if (commentController.text.trim().isEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      'Komentar tidak boleh kosong',
+                                    ),
+                                  ),
+                                );
+                                return;
+                              }
+                              Navigator.pop(context);
+                              await _updateReview(
+                                reviewId,
+                                commentController.text.trim(),
+                                selectedRating,
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF6E473B),
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 0,
+                            ),
+                            child: Text(
+                              'Update',
+                              style: GoogleFonts.poppins(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ).then((_) {
+      // Dispose controller setelah dialog ditutup
+      commentController.dispose();
+    });
+  }
+
+  Future<void> _updateReview(int reviewId, String comment, int rating) async {
+    try {
+      await _api.updateReview(
+        reviewId: reviewId,
+        comment: comment,
+        rating: rating,
+      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Row(
+              children: [
+                Icon(Icons.check_circle_rounded, color: Colors.white),
+                SizedBox(width: 12),
+                Text('Ulasan berhasil diupdate'),
+              ],
+            ),
+            backgroundColor: Colors.green.shade600,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        );
+        _refreshKosDetail();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Row(
+              children: [
+                Icon(Icons.error_outline, color: Colors.white),
+                SizedBox(width: 12),
+                Text('Gagal mengupdate ulasan'),
+              ],
+            ),
+            backgroundColor: Colors.red.shade600,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _deleteReview(int reviewId) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.6),
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 400),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(28),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.15),
+                blurRadius: 30,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header dengan gradient merah
+              ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(28),
+                  topRight: Radius.circular(28),
+                ),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 20,
+                  ),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Colors.red.shade600,
+                        Colors.red.shade500,
+                        Colors.red.shade600,
+                      ],
+                      stops: const [0.0, 0.5, 1.0],
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(
+                          Icons.delete_outline_rounded,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Text(
+                          'Hapus Ulasan?',
+                          style: GoogleFonts.poppins(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.red.shade50,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.delete_outline_rounded,
+                        color: Colors.red.shade600,
+                        size: 48,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      'Ulasan yang dihapus tidak dapat dikembalikan',
+                      style: GoogleFonts.poppins(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                        color: const Color(0xFF291C0E),
+                        height: 1.5,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 28),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: () => Navigator.pop(context, false),
+                            icon: const Icon(Icons.close_rounded, size: 18),
+                            label: Text(
+                              'Batal',
+                              style: GoogleFonts.poppins(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              side: BorderSide(
+                                color: Colors.grey.shade300,
+                                width: 1.5,
+                              ),
+                              foregroundColor: Colors.grey.shade700,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: () => Navigator.pop(context, true),
+                            icon: const Icon(Icons.delete_rounded, size: 18),
+                            label: Text(
+                              'Hapus',
+                              style: GoogleFonts.poppins(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red.shade600,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              elevation: 0,
+                              shadowColor: Colors.transparent,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        await _api.deleteReview(reviewId);
+        if (mounted) {
+          // Tampilkan dialog sukses setelah berhasil menghapus
+          _showDeleteSuccessNotification(context);
+          _refreshKosDetail();
+        }
+      } catch (e) {
+        if (mounted) {
+          // Tampilkan dialog error jika gagal menghapus
+          _showDeleteErrorNotification(context, e);
+        }
+      }
+    }
+  }
+
+  void _showDeleteSuccessNotification(BuildContext context) {
+    bool isDialogOpen = true;
+    final timerRef = <Timer?>[null];
+
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.6),
+      barrierDismissible: false,
+      useRootNavigator: true,
+      builder: (dialogContext) {
+        // Auto close setelah 3 detik (hanya sekali)
+        if (timerRef[0] == null) {
+          timerRef[0] = Timer(const Duration(seconds: 3), () {
+            if (isDialogOpen &&
+                dialogContext.mounted &&
+                Navigator.of(dialogContext, rootNavigator: true).canPop()) {
+              Navigator.of(dialogContext, rootNavigator: true).pop();
+              isDialogOpen = false;
+            }
+          });
+        }
+
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 400),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(28),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.15),
+                  blurRadius: 30,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Header dengan gradient hijau
+                ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(28),
+                    topRight: Radius.circular(28),
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 20,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.green.shade600,
+                          Colors.green.shade500,
+                          Colors.green.shade600,
+                        ],
+                        stops: const [0.0, 0.5, 1.0],
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(
+                            Icons.check_circle_rounded,
+                            color: Colors.white,
+                            size: 24,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Text(
+                            'Ulasan Berhasil Dihapus',
+                            style: GoogleFonts.poppins(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.green.shade50,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.check_circle_rounded,
+                          color: Colors.green.shade600,
+                          size: 48,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        'Ulasan telah berhasil dihapus',
+                        style: GoogleFonts.poppins(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFF291C0E),
+                          height: 1.5,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 28),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            isDialogOpen = false;
+                            timerRef[0]?.cancel();
+                            Navigator.of(
+                              dialogContext,
+                              rootNavigator: true,
+                            ).pop();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green.shade600,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            elevation: 0,
+                            shadowColor: Colors.transparent,
+                          ),
+                          child: Text(
+                            'Tutup',
+                            style: GoogleFonts.poppins(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showDeleteErrorNotification(BuildContext context, dynamic error) {
+    String message = 'Gagal menghapus ulasan';
+
+    if (error is DioException) {
+      final data = error.response?.data;
+      if (data is Map && data['message'] != null) {
+        message = data['message'].toString();
+      } else if (data is String) {
+        message = data;
+      }
+    }
+
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.6),
+      barrierDismissible: true,
+      useRootNavigator: true,
+      builder: (dialogContext) => Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 400),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(28),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.15),
+                blurRadius: 30,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header dengan gradient merah
+              ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(28),
+                  topRight: Radius.circular(28),
+                ),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 20,
+                  ),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Colors.red.shade600,
+                        Colors.red.shade500,
+                        Colors.red.shade600,
+                      ],
+                      stops: const [0.0, 0.5, 1.0],
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(
+                          Icons.error_outline_rounded,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Text(
+                          'Gagal Menghapus Ulasan',
+                          style: GoogleFonts.poppins(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.red.shade50,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.error_outline_rounded,
+                        color: Colors.red.shade600,
+                        size: 48,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      message,
+                      style: GoogleFonts.poppins(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                        color: const Color(0xFF291C0E),
+                        height: 1.5,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 28),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.of(
+                          dialogContext,
+                          rootNavigator: true,
+                        ).pop(),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red.shade600,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          elevation: 0,
+                          shadowColor: Colors.transparent,
+                        ),
+                        child: Text(
+                          'Mengerti',
+                          style: GoogleFonts.poppins(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final initial = widget.initial;
@@ -2157,6 +3003,7 @@ class _KosDetailPageState extends State<KosDetailPage> {
               (data['paymentMethods'] as List?) ??
               const [];
           final avgRating = data['average_rating']?.toString();
+          final reviews = (data['reviews'] as List?) ?? const [];
 
           // Check if current user is owner
           final owner = data['owner'] as Map<String, dynamic>?;
@@ -2869,6 +3716,146 @@ class _KosDetailPageState extends State<KosDetailPage> {
                                   );
                                 }),
                             ],
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+
+                        // Reviews Section
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: _ModernSectionCard(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: const Color(
+                                          0xFF6E473B,
+                                        ).withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: const Icon(
+                                        Icons.star_rounded,
+                                        size: 20,
+                                        color: Color(0xFF6E473B),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        'Ulasan & Komentar',
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w700,
+                                          color: const Color(0xFF291C0E),
+                                        ),
+                                      ),
+                                    ),
+                                    if (_userRole == 'society' && !isOwner)
+                                      TextButton.icon(
+                                        onPressed: () => _showAddReviewDialog(
+                                          context,
+                                          widget.kosId,
+                                        ),
+                                        icon: const Icon(
+                                          Icons.add_rounded,
+                                          size: 18,
+                                        ),
+                                        label: Text(
+                                          'Tambah',
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        style: TextButton.styleFrom(
+                                          foregroundColor: const Color(
+                                            0xFF6E473B,
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                const SizedBox(height: 16),
+                                if (reviews.isEmpty)
+                                  Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(20),
+                                      child: Column(
+                                        children: [
+                                          Icon(
+                                            Icons.reviews_outlined,
+                                            size: 48,
+                                            color: Colors.grey.shade400,
+                                          ),
+                                          const SizedBox(height: 12),
+                                          Text(
+                                            'Belum ada ulasan',
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 14,
+                                              color: Colors.grey.shade600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                                else
+                                  ...reviews.map((r) {
+                                    final review = r as Map<String, dynamic>;
+                                    final reviewId = (review['id'] as num?)
+                                        ?.toInt();
+                                    final comment =
+                                        review['comment']?.toString() ?? '';
+                                    final rating =
+                                        review['rating'] as int? ?? 0;
+                                    final user =
+                                        review['user']
+                                            as Map<String, dynamic>? ??
+                                        {};
+                                    final userName =
+                                        user['name']?.toString() ?? 'User';
+                                    final createdAt = review['created_at']
+                                        ?.toString();
+                                    final reply =
+                                        review['reply']
+                                            as Map<String, dynamic>?;
+                                    final isMyReview =
+                                        reviewId != null &&
+                                        _currentUserId != null &&
+                                        (user['id'] as num?)?.toInt() ==
+                                            _currentUserId;
+
+                                    return Padding(
+                                      padding: const EdgeInsets.only(
+                                        bottom: 16,
+                                      ),
+                                      child: _ReviewItem(
+                                        userName: userName,
+                                        comment: comment,
+                                        rating: rating,
+                                        createdAt: createdAt,
+                                        reply: reply,
+                                        isMyReview: isMyReview,
+                                        onEdit: isMyReview && reviewId != null
+                                            ? () => _showEditReviewDialog(
+                                                context,
+                                                reviewId!,
+                                                comment,
+                                                rating,
+                                              )
+                                            : null,
+                                        onDelete: isMyReview && reviewId != null
+                                            ? () => _deleteReview(reviewId!)
+                                            : null,
+                                      ),
+                                    );
+                                  }),
+                              ],
+                            ),
                           ),
                         ),
                         const SizedBox(height: 100),
@@ -3609,6 +4596,994 @@ class _ModernRoomCard extends StatelessWidget {
               ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _AddReviewDialog extends StatefulWidget {
+  final int kosId;
+  final BuildContext parentContext;
+  final VoidCallback onReviewAdded;
+
+  const _AddReviewDialog({
+    required this.kosId,
+    required this.parentContext,
+    required this.onReviewAdded,
+  });
+
+  @override
+  State<_AddReviewDialog> createState() => _AddReviewDialogState();
+}
+
+class _AddReviewDialogState extends State<_AddReviewDialog> {
+  final _api = ApiService();
+  late final TextEditingController _commentController;
+  int _selectedRating = 5;
+  bool _isSubmitting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _commentController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _commentController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submitReview() async {
+    if (_commentController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(
+                Icons.info_outline_rounded,
+                color: Colors.white,
+                size: 20,
+              ),
+              const SizedBox(width: 12),
+              const Expanded(child: Text('Komentar tidak boleh kosong')),
+            ],
+          ),
+          backgroundColor: Colors.orange.shade600,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      );
+      return;
+    }
+
+    setState(() => _isSubmitting = true);
+
+    try {
+      await _api.addReview(
+        kosId: widget.kosId,
+        comment: _commentController.text.trim(),
+        rating: _selectedRating,
+      );
+      if (mounted) {
+        Navigator.pop(context);
+        // Tampilkan success notification setelah dialog ditutup
+        Future.delayed(const Duration(milliseconds: 300), () {
+          if (widget.parentContext.mounted) {
+            _showSuccessNotification(widget.parentContext);
+            widget.onReviewAdded();
+          }
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        // Tutup dialog terlebih dahulu
+        Navigator.pop(context);
+
+        // Tampilkan dialog error setelah dialog ditutup menggunakan parent context
+        Future.delayed(const Duration(milliseconds: 300), () {
+          if (widget.parentContext.mounted) {
+            _showErrorDialog(widget.parentContext, e);
+          }
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+      }
+    }
+  }
+
+  void _showErrorDialog(BuildContext context, dynamic error) {
+    String message = 'Gagal menambahkan ulasan';
+    String title = 'Tidak Dapat Menambahkan Ulasan';
+    IconData icon = Icons.error_outline_rounded;
+    Color iconColor = Colors.red.shade600;
+
+    if (error is DioException) {
+      final data = error.response?.data;
+      print('DEBUG Error Dialog - Response data: $data');
+
+      if (data is Map) {
+        if (data['message'] != null) {
+          message = data['message'].toString();
+          print('DEBUG Error Dialog - Message from response: $message');
+        }
+        if (data['errors'] is Map) {
+          final errors = data['errors'] as Map;
+          if (errors.isNotEmpty) {
+            final firstError = errors.values.first;
+            if (firstError is List && firstError.isNotEmpty) {
+              message = firstError.first.toString();
+            } else if (firstError is String) {
+              message = firstError;
+            }
+          }
+        }
+      } else if (data is String) {
+        message = data;
+      }
+
+      if (error.response?.statusCode == 400) {
+        final lowerMessage = message.toLowerCase();
+        if (lowerMessage.contains('booked') ||
+            lowerMessage.contains('booking') ||
+            lowerMessage.contains('diterima') ||
+            lowerMessage.contains('accepted')) {
+          title = 'Belum Memenuhi Syarat';
+          message =
+              'Anda hanya bisa memberikan ulasan untuk kos yang sudah Anda booking dan diterima';
+          icon = Icons.info_outline_rounded;
+          iconColor = Colors.orange.shade600;
+        } else if (lowerMessage.contains('already reviewed') ||
+            lowerMessage.contains('sudah') ||
+            lowerMessage.contains('reviewed')) {
+          title = 'Ulasan Sudah Ada';
+          message = 'Anda sudah memberikan ulasan untuk kos ini';
+          icon = Icons.star_outline_rounded;
+          iconColor = Colors.amber.shade700;
+        }
+      }
+    }
+
+    print('DEBUG Error Dialog - Final message: $message');
+
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.6),
+      barrierDismissible: true,
+      useRootNavigator: true,
+      builder: (dialogContext) => Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 400),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(28),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.15),
+                blurRadius: 30,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header dengan gradient merah/orange
+              ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(28),
+                  topRight: Radius.circular(28),
+                ),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 20,
+                  ),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        iconColor,
+                        iconColor.withOpacity(0.8),
+                        iconColor,
+                      ],
+                      stops: const [0.0, 0.5, 1.0],
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(icon, color: Colors.white, size: 24),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Text(
+                          title,
+                          style: GoogleFonts.poppins(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: iconColor.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(icon, color: iconColor, size: 48),
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      message,
+                      style: GoogleFonts.poppins(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                        color: const Color(0xFF291C0E),
+                        height: 1.5,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 28),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.of(
+                          dialogContext,
+                          rootNavigator: true,
+                        ).pop(),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: iconColor,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          elevation: 0,
+                          shadowColor: Colors.transparent,
+                        ),
+                        child: Text(
+                          'Mengerti',
+                          style: GoogleFonts.poppins(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showSuccessNotification(BuildContext context) {
+    bool isDialogOpen = true;
+    final timerRef = <Timer?>[null];
+
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.6),
+      barrierDismissible: false,
+      useRootNavigator: true,
+      builder: (dialogContext) {
+        // Auto close setelah 3 detik (hanya sekali)
+        if (timerRef[0] == null) {
+          timerRef[0] = Timer(const Duration(seconds: 3), () {
+            if (isDialogOpen &&
+                dialogContext.mounted &&
+                Navigator.of(dialogContext, rootNavigator: true).canPop()) {
+              Navigator.of(dialogContext, rootNavigator: true).pop();
+              isDialogOpen = false;
+            }
+          });
+        }
+
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 400),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(28),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.15),
+                  blurRadius: 30,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Header dengan gradient hijau
+                ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(28),
+                    topRight: Radius.circular(28),
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 20,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.green.shade600,
+                          Colors.green.shade500,
+                          Colors.green.shade600,
+                        ],
+                        stops: const [0.0, 0.5, 1.0],
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(
+                            Icons.check_circle_rounded,
+                            color: Colors.white,
+                            size: 24,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Text(
+                            'Ulasan Berhasil Ditambahkan',
+                            style: GoogleFonts.poppins(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.green.shade50,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.check_circle_rounded,
+                          color: Colors.green.shade600,
+                          size: 48,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        'Terima kasih telah memberikan ulasan!',
+                        style: GoogleFonts.poppins(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFF291C0E),
+                          height: 1.5,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 28),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            isDialogOpen = false;
+                            timerRef[0]?.cancel();
+                            Navigator.of(
+                              dialogContext,
+                              rootNavigator: true,
+                            ).pop();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green.shade600,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            elevation: 0,
+                            shadowColor: Colors.transparent,
+                          ),
+                          child: Text(
+                            'Tutup',
+                            style: GoogleFonts.poppins(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      child: Container(
+        constraints: BoxConstraints(
+          maxWidth: 400,
+          maxHeight: MediaQuery.of(context).size.height * 0.9,
+        ),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(28),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.15),
+              blurRadius: 30,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header
+              ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(28),
+                  topRight: Radius.circular(28),
+                ),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 20,
+                  ),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        const Color(0xFF6E473B),
+                        const Color(0xFF8B6F5E),
+                        const Color(0xFF6E473B),
+                      ],
+                      stops: const [0.0, 0.5, 1.0],
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(
+                          Icons.star_rounded,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Tambah Ulasan',
+                              style: GoogleFonts.poppins(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              'Bagikan pengalaman Anda',
+                              style: GoogleFonts.poppins(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400,
+                                color: Colors.white.withOpacity(0.9),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Rating Section
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.amber.shade50,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: Colors.amber.shade100,
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.star_rate_rounded,
+                                color: Colors.amber.shade700,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Berikan Rating',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w700,
+                                  color: const Color(0xFF291C0E),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: List.generate(5, (index) {
+                                final rating = index + 1;
+                                return GestureDetector(
+                                  onTap: () =>
+                                      setState(() => _selectedRating = rating),
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 200),
+                                    curve: Curves.easeInOut,
+                                    margin: const EdgeInsets.symmetric(
+                                      horizontal: 4,
+                                    ),
+                                    child: Icon(
+                                      rating <= _selectedRating
+                                          ? Icons.star_rounded
+                                          : Icons.star_outline_rounded,
+                                      color: rating <= _selectedRating
+                                          ? Colors.amber.shade700
+                                          : Colors.grey.shade300,
+                                      size: rating <= _selectedRating ? 40 : 36,
+                                    ),
+                                  ),
+                                );
+                              }),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Center(
+                            child: Text(
+                              _selectedRating == 1
+                                  ? 'Sangat Buruk'
+                                  : _selectedRating == 2
+                                  ? 'Buruk'
+                                  : _selectedRating == 3
+                                  ? 'Cukup'
+                                  : _selectedRating == 4
+                                  ? 'Baik'
+                                  : 'Sangat Baik',
+                              style: GoogleFonts.poppins(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.amber.shade700,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    // Comment Section
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.edit_note_rounded,
+                          color: const Color(0xFF6E473B),
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Komentar',
+                          style: GoogleFonts.poppins(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFF291C0E),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: _commentController,
+                      maxLines: 5,
+                      enabled: !_isSubmitting,
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        color: const Color(0xFF291C0E),
+                      ),
+                      decoration: InputDecoration(
+                        hintText: 'Tulis ulasan Anda tentang kos ini...',
+                        hintStyle: GoogleFonts.poppins(
+                          fontSize: 14,
+                          color: Colors.grey.shade400,
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey.shade50,
+                        contentPadding: const EdgeInsets.all(16),
+                        prefixIcon: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Icon(
+                            Icons.message_rounded,
+                            color: Colors.grey.shade400,
+                            size: 20,
+                          ),
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(
+                            color: Colors.grey.shade300,
+                            width: 1.5,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(
+                            color: Colors.grey.shade300,
+                            width: 1.5,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: const BorderSide(
+                            color: Color(0xFF6E473B),
+                            width: 2,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 28),
+                    // Buttons
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: _isSubmitting
+                                ? null
+                                : () => Navigator.pop(context),
+                            icon: const Icon(Icons.close_rounded, size: 18),
+                            label: Text(
+                              'Batal',
+                              style: GoogleFonts.poppins(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              side: BorderSide(
+                                color: Colors.grey.shade300,
+                                width: 1.5,
+                              ),
+                              foregroundColor: Colors.grey.shade700,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          flex: 2,
+                          child: ElevatedButton.icon(
+                            onPressed: _isSubmitting ? null : _submitReview,
+                            icon: _isSubmitting
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : const Icon(Icons.send_rounded, size: 18),
+                            label: Text(
+                              _isSubmitting ? 'Mengirim...' : 'Kirim Ulasan',
+                              style: GoogleFonts.poppins(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF6E473B),
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              elevation: 0,
+                              shadowColor: Colors.transparent,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ReviewItem extends StatelessWidget {
+  final String userName;
+  final String comment;
+  final int rating;
+  final String? createdAt;
+  final Map<String, dynamic>? reply;
+  final bool isMyReview;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
+
+  const _ReviewItem({
+    required this.userName,
+    required this.comment,
+    required this.rating,
+    this.createdAt,
+    this.reply,
+    required this.isMyReview,
+    this.onEdit,
+    this.onDelete,
+  });
+
+  String _formatDate(String? dateStr) {
+    if (dateStr == null) return '';
+    try {
+      final date = DateTime.parse(dateStr);
+      final now = DateTime.now();
+      final difference = now.difference(date);
+
+      if (difference.inDays == 0) {
+        if (difference.inHours == 0) {
+          if (difference.inMinutes == 0) {
+            return 'Baru saja';
+          }
+          return '${difference.inMinutes} menit yang lalu';
+        }
+        return '${difference.inHours} jam yang lalu';
+      } else if (difference.inDays < 7) {
+        return '${difference.inDays} hari yang lalu';
+      } else {
+        return '${date.day}/${date.month}/${date.year}';
+      }
+    } catch (e) {
+      return dateStr;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade200, width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF6E473B).withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Text(
+                    userName.isNotEmpty ? userName[0].toUpperCase() : 'U',
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF6E473B),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            userName,
+                            style: GoogleFonts.poppins(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: const Color(0xFF291C0E),
+                            ),
+                          ),
+                        ),
+                        if (isMyReview) ...[
+                          if (onEdit != null)
+                            IconButton(
+                              icon: const Icon(
+                                Icons.edit_rounded,
+                                size: 18,
+                                color: Color(0xFF6E473B),
+                              ),
+                              onPressed: onEdit,
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                            ),
+                          if (onDelete != null)
+                            IconButton(
+                              icon: const Icon(
+                                Icons.delete_outline_rounded,
+                                size: 18,
+                                color: Colors.red,
+                              ),
+                              onPressed: onDelete,
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                            ),
+                        ],
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        ...List.generate(5, (index) {
+                          return Icon(
+                            index < rating
+                                ? Icons.star_rounded
+                                : Icons.star_outline_rounded,
+                            size: 14,
+                            color: index < rating
+                                ? Colors.amber
+                                : Colors.grey.shade300,
+                          );
+                        }),
+                        if (createdAt != null) ...[
+                          const SizedBox(width: 8),
+                          Text(
+                            _formatDate(createdAt),
+                            style: GoogleFonts.poppins(
+                              fontSize: 12,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            comment,
+            style: GoogleFonts.poppins(
+              fontSize: 14,
+              color: const Color(0xFF291C0E).withOpacity(0.8),
+              height: 1.5,
+            ),
+          ),
+          if (reply != null && reply!['owner_reply'] != null) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF6E473B).withOpacity(0.05),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: const Color(0xFF6E473B).withOpacity(0.2),
+                ),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.store_rounded,
+                    size: 16,
+                    color: const Color(0xFF6E473B),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Balasan Pemilik',
+                          style: GoogleFonts.poppins(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFF6E473B),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          reply!['owner_reply'].toString(),
+                          style: GoogleFonts.poppins(
+                            fontSize: 13,
+                            color: const Color(0xFF291C0E).withOpacity(0.8),
+                            height: 1.4,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }

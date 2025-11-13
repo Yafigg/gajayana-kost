@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -56,9 +58,17 @@ class _RegisterPageState extends State<RegisterPage> {
         passwordConfirmation: _confirmPasswordController.text,
         phone: _phoneController.text.trim(),
         role: _selectedRole,
+        saveToken: false, // Jangan simpan token, user harus login dulu
       );
       if (!mounted) return;
-      Navigator.of(context).pushNamedAndRemoveUntil('/dashboard', (_) => false);
+      
+      // Tampilkan dialog sukses
+      await _showSuccessDialog();
+      
+      // Kembali ke halaman login
+      if (mounted) {
+        Navigator.of(context).pushReplacementNamed('/login');
+      }
     } catch (e) {
       String msg = 'Registrasi gagal. Coba lagi.';
       if (e is DioException) {
@@ -175,6 +185,175 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
+  Future<void> _showSuccessDialog() async {
+    bool isDialogOpen = true;
+    final timerRef = <Timer?>[null];
+    
+    await showDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.6),
+      barrierDismissible: false,
+      useRootNavigator: true,
+      builder: (dialogContext) {
+        // Auto close setelah 3 detik (hanya sekali)
+        if (timerRef[0] == null) {
+          timerRef[0] = Timer(const Duration(seconds: 3), () {
+            if (isDialogOpen && dialogContext.mounted && Navigator.of(dialogContext, rootNavigator: true).canPop()) {
+              Navigator.of(dialogContext, rootNavigator: true).pop();
+              isDialogOpen = false;
+            }
+          });
+        }
+
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 400),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(28),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.15),
+                  blurRadius: 30,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Header dengan gradient hijau
+                ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(28),
+                    topRight: Radius.circular(28),
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 20,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.green.shade600,
+                          Colors.green.shade500,
+                          Colors.green.shade600,
+                        ],
+                        stops: const [0.0, 0.5, 1.0],
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(
+                            Icons.check_circle_rounded,
+                            color: Colors.white,
+                            size: 24,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Text(
+                            'Registrasi Berhasil',
+                            style: GoogleFonts.poppins(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.green.shade50,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.check_circle_rounded,
+                          color: Colors.green.shade600,
+                          size: 48,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        'Akun Anda berhasil dibuat!',
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF291C0E),
+                          height: 1.5,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Silakan login untuk melanjutkan',
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: const Color(0xFF291C0E).withOpacity(0.6),
+                          height: 1.5,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 28),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            isDialogOpen = false;
+                            timerRef[0]?.cancel();
+                            Navigator.of(dialogContext, rootNavigator: true).pop();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green.shade600,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            elevation: 0,
+                            shadowColor: Colors.transparent,
+                          ),
+                          child: Text(
+                            'Oke',
+                            style: GoogleFonts.poppins(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   void dispose() {
     _firstNameController.dispose();
@@ -286,8 +465,6 @@ class _FormSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-
     return Form(
       key: formKey,
       child: Column(

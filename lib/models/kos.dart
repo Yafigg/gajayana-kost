@@ -10,6 +10,8 @@ class Kos {
   final String? description;
   final String? image;
   final double? price;
+  @JsonKey(name: 'average_rating')
+  final double? averageRating;
   final List<String>? facilities;
   final List<String>? paymentMethods;
   final List<Map<String, dynamic>>? rooms;
@@ -22,6 +24,7 @@ class Kos {
     this.description,
     this.image,
     this.price,
+    this.averageRating,
     this.facilities,
     this.paymentMethods,
     this.rooms,

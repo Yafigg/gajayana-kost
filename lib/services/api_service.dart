@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../config.dart';
@@ -91,6 +93,7 @@ class ApiService {
     required String passwordConfirmation,
     required String phone,
     required String role, // 'owner' atau 'society'
+    bool saveToken = true, // Default true untuk backward compatibility
   }) async {
     final response = await _dio.post(
       '/auth/register',
@@ -110,8 +113,11 @@ class ApiService {
       final userJson = data?['user'] as Map<String, dynamic>?;
       if (token.isNotEmpty && userJson != null) {
         final user = User.fromJson(userJson);
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('auth_token', token);
+        // Hanya simpan token jika saveToken = true
+        if (saveToken) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('auth_token', token);
+        }
         return (user, token);
       }
     }
@@ -161,12 +167,16 @@ class ApiService {
         }
       } catch (_) {}
 
+      final price = map['price_per_month'] as num?;
+      final avgRating = map['average_rating'] as num?;
       return Kos(
         id: (map['id'] as num).toInt(),
         name: (map['name'] ?? '').toString(),
         address: (map['address'] ?? '').toString(),
         description: (map['description'] as String?),
         image: imageUrl,
+        price: price != null ? price.toDouble() : null,
+        averageRating: avgRating != null ? avgRating.toDouble() : null,
       );
     }).toList();
   }
@@ -205,12 +215,16 @@ class ApiService {
           }
         }
       } catch (_) {}
+      final price = map['price_per_month'] as num?;
+      final avgRating = map['average_rating'] as num?;
       return Kos(
         id: (map['id'] as num).toInt(),
         name: (map['name'] ?? '').toString(),
         address: (map['address'] ?? '').toString(),
         description: (map['description'] as String?),
         image: imageUrl,
+        price: price != null ? price.toDouble() : null,
+        averageRating: avgRating != null ? avgRating.toDouble() : null,
       );
     }).toList();
     int? nextPage;
@@ -717,6 +731,7 @@ class ApiService {
     required List<String> paymentMethods,
     required List<Map<String, dynamic>> rooms,
     List<String>? images,
+    Map<int, Uint8List>? imageBytes,
   }) async {
     try {
       final token = await _getToken();
@@ -835,12 +850,32 @@ class ApiService {
         for (int i = 0; i < images.length; i++) {
           final imagePath = images[i];
           if (imagePath.isNotEmpty) {
-            formData.files.add(
-              MapEntry(
-                'images[]', // Laravel will parse this as images array
-                await MultipartFile.fromFile(imagePath),
-              ),
-            );
+            if (kIsWeb && imageBytes != null && imageBytes.containsKey(i)) {
+              // Untuk web, gunakan bytes
+              // Pastikan filename memiliki extension yang benar
+              String filename = imagePath;
+              if (!filename.contains('.')) {
+                filename = 'image_$i.jpg';
+              }
+              print(
+                'Uploading image $i: $filename, size: ${imageBytes[i]!.length} bytes',
+              );
+              formData.files.add(
+                MapEntry(
+                  'images[]', // Laravel will parse this as images array
+                  MultipartFile.fromBytes(imageBytes[i]!, filename: filename),
+                ),
+              );
+            } else {
+              // Untuk mobile, gunakan file path
+              print('Uploading image $i from path: $imagePath');
+              formData.files.add(
+                MapEntry(
+                  'images[]', // Laravel will parse this as images array
+                  await MultipartFile.fromFile(imagePath),
+                ),
+              );
+            }
           }
         }
 
@@ -971,6 +1006,65 @@ class ApiService {
     }
   }
 
+  // Review Management (Society)
+  Future<Map<String, dynamic>> addReview({
+    required int kosId,
+    required String comment,
+    required int rating,
+  }) async {
+    try {
+      final response = await _dio.post(
+        '/kos/$kosId/reviews',
+        data: {'comment': comment, 'rating': rating},
+      );
+      if (response.statusCode == 201 && response.data is Map) {
+        return response.data as Map<String, dynamic>;
+      }
+      throw DioException(
+        requestOptions: response.requestOptions,
+        response: response,
+        message: 'Gagal menambahkan review',
+      );
+    } catch (e) {
+      print('Error adding review: $e');
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> updateReview({
+    required int reviewId,
+    String? comment,
+    int? rating,
+  }) async {
+    try {
+      final data = <String, dynamic>{};
+      if (comment != null) data['comment'] = comment;
+      if (rating != null) data['rating'] = rating;
+
+      final response = await _dio.put('/reviews/$reviewId', data: data);
+      if (response.statusCode == 200 && response.data is Map) {
+        return response.data as Map<String, dynamic>;
+      }
+      throw DioException(
+        requestOptions: response.requestOptions,
+        response: response,
+        message: 'Gagal mengupdate review',
+      );
+    } catch (e) {
+      print('Error updating review: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> deleteReview(int reviewId) async {
+    try {
+      await _dio.delete('/reviews/$reviewId');
+    } catch (e) {
+      print('Error deleting review: $e');
+      rethrow;
+    }
+  }
+
   // Transaction History/Reports
   Future<Map<String, dynamic>> getTransactionHistory({
     String? month, // Format: YYYY-MM
@@ -1082,6 +1176,154 @@ class ApiService {
       return [];
     } catch (e) {
       // If there's an error, return empty list
+      return [];
+    }
+  }
+
+  // Facility Management (Owner)
+  Future<List<Map<String, dynamic>>> getOwnerKos() async {
+    try {
+      final response = await _dio.get('/owner/kos');
+      if (response.statusCode == 200 && response.data is Map) {
+        final data = response.data['data'];
+        if (data is List) {
+          return data.cast<Map<String, dynamic>>();
+        }
+      }
+      return const [];
+    } catch (e) {
+      print('Error fetching owner kos: $e');
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> getAnalytics() async {
+    try {
+      print('DEBUG ApiService: Fetching analytics from /owner/analytics');
+      final response = await _dio.get('/owner/analytics');
+      print(
+        'DEBUG ApiService: Analytics response status: ${response.statusCode}',
+      );
+      print('DEBUG ApiService: Analytics response data: ${response.data}');
+
+      if (response.statusCode == 200 && response.data is Map) {
+        final data = response.data as Map<String, dynamic>;
+        print('DEBUG ApiService: Response data type: ${data.runtimeType}');
+        print('DEBUG ApiService: Success flag: ${data['success']}');
+
+        if (data['success'] == true && data['data'] != null) {
+          final result = data['data'] as Map<String, dynamic>;
+          print('DEBUG ApiService: Analytics data: $result');
+          return result;
+        } else {
+          print('DEBUG ApiService: Success is false or data is null');
+        }
+      }
+      throw DioException(
+        requestOptions: response.requestOptions,
+        response: response,
+        message: 'Gagal memuat analytics',
+      );
+    } catch (e) {
+      print('Error fetching analytics: $e');
+      if (e is DioException) {
+        print('DioException details: ${e.response?.data}');
+        print('DioException status: ${e.response?.statusCode}');
+      }
+      rethrow;
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getFacilities(int kosId) async {
+    try {
+      final response = await _dio.get('/owner/kos/$kosId/facilities');
+      if (response.statusCode == 200 && response.data is Map) {
+        final data = response.data['data'];
+        if (data is List) {
+          return data.cast<Map<String, dynamic>>();
+        }
+      }
+      return const [];
+    } catch (e) {
+      print('Error fetching facilities: $e');
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> addFacilities(
+    int kosId,
+    List<Map<String, dynamic>> facilities,
+  ) async {
+    try {
+      final response = await _dio.post(
+        '/owner/kos/$kosId/facilities',
+        data: {'facilities': facilities},
+      );
+
+      if (response.statusCode == 201 && response.data is Map) {
+        return response.data as Map<String, dynamic>;
+      }
+
+      throw DioException(
+        requestOptions: response.requestOptions,
+        response: response,
+        message: 'Gagal menambahkan facilities',
+      );
+    } catch (e) {
+      print('Error adding facilities: $e');
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> updateFacility(
+    int kosId,
+    int facilityId,
+    String facility,
+    String? icon,
+  ) async {
+    try {
+      final response = await _dio.put(
+        '/owner/kos/$kosId/facilities/$facilityId',
+        data: {'facility': facility, if (icon != null) 'icon': icon},
+      );
+
+      if (response.statusCode == 200 && response.data is Map) {
+        return response.data as Map<String, dynamic>;
+      }
+
+      throw DioException(
+        requestOptions: response.requestOptions,
+        response: response,
+        message: 'Gagal mengupdate facility',
+      );
+    } catch (e) {
+      print('Error updating facility: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> deleteFacility(int kosId, int facilityId) async {
+    try {
+      await _dio.delete('/owner/kos/$kosId/facilities/$facilityId');
+    } catch (e) {
+      print('Error deleting facility: $e');
+      rethrow;
+    }
+  }
+
+  // Get favorites list (for society users)
+  Future<List<Map<String, dynamic>>> getFavorites() async {
+    try {
+      final response = await _dio.get('/favorites');
+      if (response.statusCode == 200 && response.data is Map) {
+        final data = response.data['data'];
+        if (data is List) {
+          return data.cast<Map<String, dynamic>>();
+        }
+      }
+      return [];
+    } catch (e) {
+      print('Error fetching favorites: $e');
       return [];
     }
   }

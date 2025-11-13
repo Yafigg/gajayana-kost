@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -27,7 +29,8 @@ class _AddKosPageState extends State<AddKosPage> {
   List<String> _selectedFacilities = [];
   List<String> _selectedPaymentMethods = [];
   List<Map<String, dynamic>> _rooms = [];
-  List<File> _selectedImages = [];
+  List<XFile> _selectedImages = [];
+  Map<int, Uint8List> _imageBytes = {}; // Cache untuk web
 
   bool _isLoading = false;
 
@@ -345,12 +348,7 @@ class _AddKosPageState extends State<AddKosPage> {
                       children: [
                         ClipRRect(
                           borderRadius: BorderRadius.circular(8),
-                          child: Image.file(
-                            _selectedImages[index],
-                            width: 100,
-                            height: 100,
-                            fit: BoxFit.cover,
-                          ),
+                          child: _buildImageWidget(_selectedImages[index], index),
                         ),
                         Positioned(
                           top: 4,
@@ -358,6 +356,20 @@ class _AddKosPageState extends State<AddKosPage> {
                           child: GestureDetector(
                             onTap: () => setState(() {
                               _selectedImages.removeAt(index);
+                              if (kIsWeb) {
+                                // Update index di _imageBytes setelah remove
+                                _imageBytes.remove(index);
+                                // Rebuild map dengan index baru
+                                final newMap = <int, Uint8List>{};
+                                for (int i = 0; i < _selectedImages.length; i++) {
+                                  if (i < index && _imageBytes.containsKey(i)) {
+                                    newMap[i] = _imageBytes[i]!;
+                                  } else if (i >= index && _imageBytes.containsKey(i + 1)) {
+                                    newMap[i] = _imageBytes[i + 1]!;
+                                  }
+                                }
+                                _imageBytes = newMap;
+                              }
                             }),
                             child: Container(
                               padding: const EdgeInsets.all(4),
@@ -932,14 +944,84 @@ class _AddKosPageState extends State<AddKosPage> {
 
   Future<void> _pickImages() async {
     final picker = ImagePicker();
-    final images = await picker.pickMultiImage(imageQuality: 85);
+    // Untuk web, gunakan original image tanpa kompresi
+    // imageQuality: null = original quality tanpa kompresi
+    final images = await picker.pickMultiImage(
+      imageQuality: null, // null = original quality untuk semua platform
+    );
     if (images.isNotEmpty) {
+      final startIndex = _selectedImages.length;
       setState(() {
-        _selectedImages.addAll(images.map((image) => File(image.path)));
+        _selectedImages.addAll(images);
         if (_selectedImages.length > 5) {
           _selectedImages = _selectedImages.take(5).toList();
         }
       });
+      
+      // Load bytes untuk web
+      if (kIsWeb) {
+        for (int i = 0; i < _selectedImages.length - startIndex; i++) {
+          final index = startIndex + i;
+          if (index < _selectedImages.length) {
+            _selectedImages[index].readAsBytes().then((bytes) {
+              if (mounted) {
+                setState(() {
+                  _imageBytes[index] = bytes;
+                });
+                print('Loaded image bytes for index $index: ${bytes.length} bytes');
+              }
+            }).catchError((error) {
+              print('Error loading image bytes for index $index: $error');
+            });
+          }
+        }
+      }
+    }
+  }
+
+  Widget _buildImageWidget(XFile imageFile, int index) {
+    if (kIsWeb) {
+      // Untuk web, gunakan Image.memory
+      if (_imageBytes.containsKey(index)) {
+        return Image.memory(
+          _imageBytes[index]!,
+          width: 100,
+          height: 100,
+          fit: BoxFit.cover,
+        );
+      } else {
+        // Load bytes jika belum ada
+        return FutureBuilder<Uint8List>(
+          future: imageFile.readAsBytes(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              _imageBytes[index] = snapshot.data!;
+              return Image.memory(
+                snapshot.data!,
+                width: 100,
+                height: 100,
+                fit: BoxFit.cover,
+              );
+            }
+            return Container(
+              width: 100,
+              height: 100,
+              color: Colors.grey.shade300,
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          },
+        );
+      }
+    } else {
+      // Untuk mobile, gunakan Image.file
+      return Image.file(
+        File(imageFile.path),
+        width: 100,
+        height: 100,
+        fit: BoxFit.cover,
+      );
     }
   }
 
@@ -997,7 +1079,10 @@ class _AddKosPageState extends State<AddKosPage> {
         facilities: _selectedFacilities,
         paymentMethods: _selectedPaymentMethods,
         rooms: _rooms,
-        images: _selectedImages.map((file) => file.path).toList(),
+        images: kIsWeb
+            ? _selectedImages.map((file) => file.name).toList()
+            : _selectedImages.map((file) => file.path).toList(),
+        imageBytes: kIsWeb ? _imageBytes : null,
       );
 
       if (!mounted) return;

@@ -52,163 +52,246 @@ class _ReviewsPageState extends State<ReviewsPage> {
     final result = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
+      barrierColor: Colors.black.withOpacity(0.6),
       builder: (context) => Dialog(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(28),
         ),
         child: Container(
-          padding: const EdgeInsets.all(24),
+          constraints: const BoxConstraints(maxWidth: 400),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(28),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.15),
+                blurRadius: 30,
+                offset: const Offset(0, 10),
+              ),
+            ],
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF6E473B).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(
-                      Icons.reply_rounded,
-                      color: Color(0xFF6E473B),
-                      size: 24,
+              // Header dengan gradient
+              ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(28),
+                  topRight: Radius.circular(28),
+                ),
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        const Color(0xFF6E473B),
+                        const Color(0xFF8B6F5E),
+                        const Color(0xFF6E473B),
+                      ],
+                      stops: const [0.0, 0.5, 1.0],
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      review['reply'] != null ? 'Edit Reply' : 'Balas Review',
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(
+                          Icons.reply_rounded,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Text(
+                          review['reply'] != null ? 'Edit Balasan' : 'Balas Review',
+                          style: GoogleFonts.poppins(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Review dari ${review['user']?['name'] ?? 'Penyewa'}:',
                       style: GoogleFonts.poppins(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
                         color: const Color(0xFF291C0E),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'Review dari ${review['user']?['name'] ?? 'Penyewa'}:',
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: const Color(0xFF291C0E),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade50,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: Colors.grey.shade200,
-                    width: 1,
-                  ),
-                ),
-                child: Text(
-                  review['comment']?.toString() ?? '-',
-                  style: GoogleFonts.poppins(
-                    fontSize: 13,
-                    color: const Color(0xFF291C0E),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'Balasan Anda:',
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: const Color(0xFF291C0E),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: replyController,
-                maxLines: 4,
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  color: const Color(0xFF291C0E),
-                ),
-                decoration: InputDecoration(
-                  hintText: 'Tulis balasan Anda...',
-                  hintStyle: GoogleFonts.poppins(
-                    color: Colors.grey.shade400,
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey.shade50,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.grey.shade300),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.grey.shade300),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
-                      color: Color(0xFF6E473B),
-                      width: 2,
-                    ),
-                  ),
-                  contentPadding: const EdgeInsets.all(16),
-                ),
-              ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.of(context).pop(false),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        side: BorderSide(color: Colors.grey.shade300),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF5F1ED),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: const Color(0xFFE1D4C2).withOpacity(0.5),
+                          width: 1,
                         ),
                       ),
-                      child: Text(
-                        'Batal',
-                        style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xFF291C0E),
-                        ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(
+                            Icons.format_quote_rounded,
+                            color: const Color(0xFF6E473B).withOpacity(0.5),
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              review['comment']?.toString() ?? '-',
+                              style: GoogleFonts.poppins(
+                                fontSize: 14,
+                                color: const Color(0xFF291C0E),
+                                height: 1.5,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () => Navigator.of(context).pop(true),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF6E473B),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                    const SizedBox(height: 24),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.edit_rounded,
+                          size: 18,
+                          color: const Color(0xFF6E473B),
                         ),
-                        elevation: 0,
+                        const SizedBox(width: 8),
+                        Text(
+                          'Balasan Anda:',
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF291C0E),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: replyController,
+                      maxLines: 4,
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        color: const Color(0xFF291C0E),
                       ),
-                      child: Text(
-                        review['reply'] != null ? 'Update' : 'Kirim',
-                        style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                      decoration: InputDecoration(
+                        hintText: 'Tulis balasan Anda...',
+                        hintStyle: GoogleFonts.poppins(
+                          color: Colors.grey.shade400,
                         ),
+                        prefixIcon: const Icon(
+                          Icons.reply_rounded,
+                          color: Color(0xFF6E473B),
+                          size: 20,
+                        ),
+                        filled: true,
+                        fillColor: const Color(0xFFF5F1ED),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide(
+                            color: const Color(0xFFE1D4C2).withOpacity(0.5),
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide(
+                            color: const Color(0xFFE1D4C2).withOpacity(0.5),
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: const BorderSide(
+                            color: Color(0xFF6E473B),
+                            width: 2,
+                          ),
+                        ),
+                        contentPadding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
                       ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 24),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: () => Navigator.of(context).pop(false),
+                            icon: const Icon(Icons.close_rounded, size: 18),
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              side: BorderSide(
+                                color: Colors.grey.shade300,
+                                width: 1.5,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                            ),
+                            label: Text(
+                              'Batal',
+                              style: GoogleFonts.poppins(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xFF291C0E),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: () => Navigator.of(context).pop(true),
+                            icon: Icon(
+                              review['reply'] != null
+                                  ? Icons.check_rounded
+                                  : Icons.send_rounded,
+                              size: 18,
+                              color: Colors.white,
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF6E473B),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              elevation: 2,
+                              shadowColor: const Color(0xFF6E473B).withOpacity(0.3),
+                            ),
+                            label: Text(
+                              review['reply'] != null ? 'Update' : 'Kirim',
+                              style: GoogleFonts.poppins(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -297,42 +380,137 @@ class _ReviewsPageState extends State<ReviewsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF291C0E)),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: Text(
-          'Review & Balasan',
-          style: GoogleFonts.poppins(
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-            color: const Color(0xFF291C0E),
+      backgroundColor: const Color(0xFFF5F1ED),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(110),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            bottomLeft: Radius.circular(30),
+            bottomRight: Radius.circular(30),
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  const Color(0xFF6E473B),
+                  const Color(0xFF8B6F5E),
+                  const Color(0xFF6E473B),
+                ],
+                stops: const [0.0, 0.5, 1.0],
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                child: Row(
+                  children: [
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: () => Navigator.of(context).pop(),
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.25),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.3),
+                              width: 1,
+                            ),
+                          ),
+                          child: const Icon(
+                            Icons.arrow_back_rounded,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Text(
+                        'Review & Balasan',
+                        style: GoogleFonts.poppins(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                          letterSpacing: -0.1,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: _loadReviews,
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.25),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.3),
+                              width: 1,
+                            ),
+                          ),
+                          child: const Icon(
+                            Icons.refresh_rounded,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
         ),
-        iconTheme: const IconThemeData(color: Color(0xFF291C0E)),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh, color: Color(0xFF6E473B)),
-            onPressed: _loadReviews,
-          ),
-        ],
       ),
       body: _isLoading
           ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6E473B)),
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                    child: const CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6E473B)),
+                      strokeWidth: 3,
+                    ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 24),
                   Text(
                     'Memuat review...',
                     style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
                       color: const Color(0xFF291C0E).withOpacity(0.6),
                     ),
                   ),
@@ -418,9 +596,9 @@ class _ReviewsPageState extends State<ReviewsPage> {
                       onRefresh: _loadReviews,
                       color: const Color(0xFF6E473B),
                       child: ListView.separated(
-                        padding: const EdgeInsets.all(20),
+                        padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
                         itemCount: _reviews.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 16),
+                        separatorBuilder: (_, __) => const SizedBox(height: 20),
                         itemBuilder: (context, index) {
                           final review = _reviews[index];
                           final user = review['user'] as Map<String, dynamic>? ?? {};
@@ -468,16 +646,12 @@ class _ReviewCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: const Color(0xFFE1D4C2).withOpacity(0.3),
-          width: 1,
-        ),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -486,19 +660,19 @@ class _ReviewCard extends StatelessWidget {
         children: [
           // Header
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  const Color(0xFF6E473B).withOpacity(0.05),
-                  const Color(0xFFE1D4C2).withOpacity(0.1),
+                  const Color(0xFF6E473B).withOpacity(0.08),
+                  const Color(0xFFE1D4C2).withOpacity(0.15),
                 ],
               ),
               borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(16),
-                topRight: Radius.circular(16),
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
               ),
             ),
             child: Row(
@@ -506,14 +680,21 @@ class _ReviewCard extends StatelessWidget {
               children: [
                 // User Avatar
                 Container(
-                  width: 48,
-                  height: 48,
+                  width: 56,
+                  height: 56,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: Colors.grey.shade300,
-                      width: 1,
+                      color: const Color(0xFF6E473B).withOpacity(0.2),
+                      width: 2,
                     ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
                   child: user['avatar'] != null
                       ? ClipOval(
@@ -559,17 +740,27 @@ class _ReviewCard extends StatelessWidget {
                             ),
                           ),
                           // Rating Stars
-                          ...List.generate(5, (index) {
-                            return Icon(
-                              index < rating
-                                  ? Icons.star_rounded
-                                  : Icons.star_border_rounded,
-                              size: 16,
-                              color: index < rating
-                                  ? Colors.amber
-                                  : Colors.grey.shade300,
-                            );
-                          }),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.amber.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: List.generate(5, (index) {
+                                return Icon(
+                                  index < rating
+                                      ? Icons.star_rounded
+                                      : Icons.star_border_rounded,
+                                  size: 18,
+                                  color: index < rating
+                                      ? Colors.amber.shade700
+                                      : Colors.grey.shade300,
+                                );
+                              }),
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 4),
@@ -596,27 +787,41 @@ class _ReviewCard extends StatelessWidget {
           ),
           // Review Comment
           Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text(
-              review['comment']?.toString() ?? '-',
-              style: GoogleFonts.poppins(
-                fontSize: 14,
-                color: const Color(0xFF291C0E),
-                height: 1.5,
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF5F1ED),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                review['comment']?.toString() ?? '-',
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  color: const Color(0xFF291C0E),
+                  height: 1.6,
+                ),
               ),
             ),
           ),
           // Reply Section
           if (reply != null) ...[
             Container(
-              margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-              padding: const EdgeInsets.all(12),
+              margin: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFF6E473B).withOpacity(0.05),
-                borderRadius: BorderRadius.circular(12),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    const Color(0xFF6E473B).withOpacity(0.08),
+                    const Color(0xFF8B6F5E).withOpacity(0.05),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: const Color(0xFF6E473B).withOpacity(0.2),
-                  width: 1,
+                  width: 1.5,
                 ),
               ),
               child: Column(
@@ -624,29 +829,36 @@ class _ReviewCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Icon(
-                        Icons.reply_rounded,
-                        size: 16,
-                        color: const Color(0xFF6E473B),
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF6E473B).withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(
+                          Icons.reply_rounded,
+                          size: 16,
+                          color: Color(0xFF6E473B),
+                        ),
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 8),
                       Text(
                         'Balasan Anda',
                         style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
                           color: const Color(0xFF6E473B),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 12),
                   Text(
                     reply!['owner_reply']?.toString() ?? '-',
                     style: GoogleFonts.poppins(
-                      fontSize: 13,
+                      fontSize: 14,
                       color: const Color(0xFF291C0E),
-                      height: 1.4,
+                      height: 1.5,
                     ),
                   ),
                 ],
@@ -655,32 +867,32 @@ class _ReviewCard extends StatelessWidget {
           ],
           // Action Button
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
             child: SizedBox(
               width: double.infinity,
-              child: OutlinedButton.icon(
+              child: ElevatedButton.icon(
                 onPressed: onReply,
                 icon: Icon(
                   reply != null ? Icons.edit_rounded : Icons.reply_rounded,
                   size: 18,
-                  color: const Color(0xFF6E473B),
+                  color: Colors.white,
                 ),
                 label: Text(
                   reply != null ? 'Edit Balasan' : 'Balas Review',
                   style: GoogleFonts.poppins(
-                    fontSize: 14,
+                    fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF6E473B),
+                    color: Colors.white,
                   ),
                 ),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  side: BorderSide(
-                    color: const Color(0xFF6E473B).withOpacity(0.3),
-                  ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF6E473B),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(14),
                   ),
+                  elevation: 2,
+                  shadowColor: const Color(0xFF6E473B).withOpacity(0.3),
                 ),
               ),
             ),
@@ -690,4 +902,5 @@ class _ReviewCard extends StatelessWidget {
     );
   }
 }
+
 

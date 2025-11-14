@@ -1157,9 +1157,15 @@ class ApiService {
     String ownerReply,
   ) async {
     try {
+      final token = await _getToken();
+      if (token == null) throw Exception('Token tidak ditemukan');
+
       final response = await _dio.post(
         '/owner/reviews/$reviewId/reply',
-        data: {'owner_reply': ownerReply},
+        data: {'reply': ownerReply}, // Changed from 'owner_reply' to 'reply' to match backend
+        options: Options(
+          headers: {'Authorization': 'Bearer $token'},
+        ),
       );
 
       if (response.statusCode == 200 && response.data is Map) {

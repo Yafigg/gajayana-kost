@@ -487,75 +487,75 @@ class _AddKosPageState extends State<AddKosPage> {
             runSpacing: 10,
             children: [
               ..._availableFacilities.map((facility) {
-                final isSelected = _selectedFacilities.contains(facility);
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      if (isSelected) {
-                        _selectedFacilities.remove(facility);
-                      } else {
-                        _selectedFacilities.add(facility);
-                      }
-                    });
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                    decoration: BoxDecoration(
+              final isSelected = _selectedFacilities.contains(facility);
+              return GestureDetector(
+                onTap: () {
+                  setState(() {
+                    if (isSelected) {
+                      _selectedFacilities.remove(facility);
+                    } else {
+                      _selectedFacilities.add(facility);
+                    }
+                  });
+                },
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? const Color(0xFF6E473B)
+                        : const Color(0xFFBEB5A9),
+                    borderRadius: BorderRadius.circular(25),
+                    border: Border.all(
                       color: isSelected
                           ? const Color(0xFF6E473B)
                           : const Color(0xFFBEB5A9),
-                      borderRadius: BorderRadius.circular(25),
-                      border: Border.all(
-                        color: isSelected
-                            ? const Color(0xFF6E473B)
-                            : const Color(0xFFBEB5A9),
-                        width: 1.5,
-                      ),
-                      boxShadow: isSelected
-                          ? [
-                              BoxShadow(
-                                color: const Color(0xFF6E473B).withOpacity(0.25),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ]
-                          : [
-                              BoxShadow(
-                                color: const Color(0xFF291C0E).withOpacity(0.08),
-                                blurRadius: 4,
-                                offset: const Offset(0, 1),
-                              ),
-                            ],
+                      width: 1.5,
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (isSelected) ...[
-                          Icon(
-                            Icons.check_circle_rounded,
-                            color: Colors.white,
-                            size: 16,
-                          ),
-                          const SizedBox(width: 6),
-                        ],
-                        Text(
-                          facility,
-                          style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: isSelected
-                                ? Colors.white
-                                : const Color(0xFF291C0E),
-                          ),
-                        ),
-                      ],
-                    ),
+                    boxShadow: isSelected
+                        ? [
+                            BoxShadow(
+                              color: const Color(0xFF6E473B).withOpacity(0.25),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ]
+                        : [
+                            BoxShadow(
+                              color: const Color(0xFF291C0E).withOpacity(0.08),
+                              blurRadius: 4,
+                              offset: const Offset(0, 1),
+                            ),
+                          ],
                   ),
-                );
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (isSelected) ...[
+                        Icon(
+                          Icons.check_circle_rounded,
+                          color: Colors.white,
+                          size: 16,
+                        ),
+                        const SizedBox(width: 6),
+                      ],
+                      Text(
+                        facility,
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: isSelected
+                              ? Colors.white
+                              : const Color(0xFF291C0E),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
               }),
               // Add button for custom facility
               GestureDetector(
@@ -689,75 +689,75 @@ class _AddKosPageState extends State<AddKosPage> {
             runSpacing: 10,
             children: [
               ..._availablePaymentMethods.map((method) {
-                final isSelected = _selectedPaymentMethods.contains(method);
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      if (isSelected) {
-                        _selectedPaymentMethods.remove(method);
-                      } else {
-                        _selectedPaymentMethods.add(method);
-                      }
-                    });
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                    decoration: BoxDecoration(
+              final isSelected = _selectedPaymentMethods.contains(method);
+              return GestureDetector(
+                onTap: () {
+                  setState(() {
+                    if (isSelected) {
+                      _selectedPaymentMethods.remove(method);
+                    } else {
+                      _selectedPaymentMethods.add(method);
+                    }
+                  });
+                },
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? const Color(0xFF6E473B)
+                        : const Color(0xFFBEB5A9),
+                    borderRadius: BorderRadius.circular(25),
+                    border: Border.all(
                       color: isSelected
                           ? const Color(0xFF6E473B)
                           : const Color(0xFFBEB5A9),
-                      borderRadius: BorderRadius.circular(25),
-                      border: Border.all(
-                        color: isSelected
-                            ? const Color(0xFF6E473B)
-                            : const Color(0xFFBEB5A9),
-                        width: 1.5,
-                      ),
-                      boxShadow: isSelected
-                          ? [
-                              BoxShadow(
-                                color: const Color(0xFF6E473B).withOpacity(0.25),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ]
-                          : [
-                              BoxShadow(
-                                color: const Color(0xFF291C0E).withOpacity(0.08),
-                                blurRadius: 4,
-                                offset: const Offset(0, 1),
-                              ),
-                            ],
+                      width: 1.5,
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (isSelected) ...[
-                          Icon(
-                            Icons.check_circle_rounded,
-                            color: Colors.white,
-                            size: 16,
-                          ),
-                          const SizedBox(width: 6),
-                        ],
-                        Text(
-                          method,
-                          style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: isSelected
-                                ? Colors.white
-                                : const Color(0xFF291C0E),
-                          ),
-                        ),
-                      ],
-                    ),
+                    boxShadow: isSelected
+                        ? [
+                            BoxShadow(
+                              color: const Color(0xFF6E473B).withOpacity(0.25),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ]
+                        : [
+                            BoxShadow(
+                              color: const Color(0xFF291C0E).withOpacity(0.08),
+                              blurRadius: 4,
+                              offset: const Offset(0, 1),
+                            ),
+                          ],
                   ),
-                );
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (isSelected) ...[
+                        Icon(
+                          Icons.check_circle_rounded,
+                          color: Colors.white,
+                          size: 16,
+                        ),
+                        const SizedBox(width: 6),
+                      ],
+                      Text(
+                        method,
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: isSelected
+                              ? Colors.white
+                              : const Color(0xFF291C0E),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
               }),
               // Add button for custom payment method
               GestureDetector(
@@ -1808,14 +1808,43 @@ class _AddRoomDialogState extends State<_AddRoomDialog> {
         ),
         ElevatedButton(
           onPressed: () {
-            if (_roomNumberController.text.trim().isNotEmpty) {
+            final roomNumber = _roomNumberController.text.trim();
+            final priceText = _priceController.text.trim();
+            
+            if (roomNumber.isEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'Nomor kamar harus diisi',
+                    style: GoogleFonts.poppins(),
+                  ),
+                  backgroundColor: Colors.red,
+                  duration: const Duration(seconds: 2),
+                ),
+              );
+              return;
+            }
+            
+            if (priceText.isEmpty || int.tryParse(priceText) == null || int.parse(priceText) <= 0) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'Harga per bulan harus diisi dan lebih dari 0',
+                    style: GoogleFonts.poppins(),
+                  ),
+                  backgroundColor: Colors.red,
+                  duration: const Duration(seconds: 2),
+                ),
+              );
+              return;
+            }
+            
               widget.onAdd({
-                'room_number': _roomNumberController.text.trim(),
+              'room_number': roomNumber,
                 'room_type': _selectedRoomType, // Should be 'single' or 'double'
-                'price': int.tryParse(_priceController.text.trim()) ?? 0, // Price is stored in kos, not room
+              'price': int.parse(priceText), // Price is required for each room
               });
               Navigator.pop(context);
-            }
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF6E473B),

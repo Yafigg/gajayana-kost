@@ -107,7 +107,14 @@ class _RegisterPageState extends State<RegisterPage> {
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_rounded, color: colors.onBackground),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            } else {
+              // If no route to pop, navigate to login
+              Navigator.of(context).pushReplacementNamed('/login');
+            }
+          },
         ),
         title: Text(
           'Register',

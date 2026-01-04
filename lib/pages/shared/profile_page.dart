@@ -23,7 +23,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final _phone = TextEditingController();
   XFile? _picked;
   bool _saving = false;
-  
+
   // Stats data
   int _favoriteCount = 0;
   int _bookingCount = 0;
@@ -170,7 +170,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
               // Profile Stats (for society users)
               if (user.role == 'society')
-                SliverToBoxAdapter(child: _buildStatsSection()),
+              SliverToBoxAdapter(child: _buildStatsSection()),
 
               // Owner Stats (for owner/admin users)
               if (user.role == 'admin' || user.role == 'owner')
@@ -280,20 +280,20 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             )
           : Row(
-              children: [
-                Expanded(
-                  child: _buildStatItem(
+        children: [
+          Expanded(
+            child: _buildStatItem(
                     icon: Icons.favorite_rounded,
-                    label: 'Kos Favorit',
+              label: 'Kos Favorit',
                     value: '$_favoriteCount',
-                    color: const Color(0xFF6E473B),
-                  ),
-                ),
-                Container(width: 1, height: 40, color: const Color(0xFFE1D4C2)),
-                Expanded(
-                  child: _buildStatItem(
-                    icon: Icons.receipt_long_rounded,
-                    label: 'Total Booking',
+              color: const Color(0xFF6E473B),
+            ),
+          ),
+          Container(width: 1, height: 40, color: const Color(0xFFE1D4C2)),
+          Expanded(
+            child: _buildStatItem(
+              icon: Icons.receipt_long_rounded,
+              label: 'Total Booking',
                     value: '$_bookingCount',
                     color: const Color(0xFFA78D78),
                   ),
@@ -344,20 +344,20 @@ class _ProfilePageState extends State<ProfilePage> {
                     icon: Icons.receipt_long_rounded,
                     label: 'Total Booking',
                     value: '$_totalBookings',
-                    color: const Color(0xFFA78D78),
-                  ),
-                ),
-                Container(width: 1, height: 40, color: const Color(0xFFE1D4C2)),
-                Expanded(
-                  child: _buildStatItem(
-                    icon: Icons.star_rounded,
-                    label: 'Rating',
-                    value: _avgRating > 0 ? _avgRating.toStringAsFixed(1) : '0.0',
-                    color: Colors.amber,
-                  ),
-                ),
-              ],
+              color: const Color(0xFFA78D78),
             ),
+          ),
+          Container(width: 1, height: 40, color: const Color(0xFFE1D4C2)),
+          Expanded(
+            child: _buildStatItem(
+              icon: Icons.star_rounded,
+              label: 'Rating',
+                    value: _avgRating > 0 ? _avgRating.toStringAsFixed(1) : '0.0',
+              color: Colors.amber,
+            ),
+          ),
+        ],
+      ),
     );
   }
 

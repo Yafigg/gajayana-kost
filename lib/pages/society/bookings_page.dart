@@ -92,7 +92,7 @@ class _BookingsPageState extends State<BookingsPage> with WidgetsBindingObserver
       } else {
         print('DEBUG BookingsPage: ⚠️ No bookings found. User role: $_userRole');
       }
-      setState(() {
+    setState(() {
         _future = Future.value(bookings);
       });
     } catch (e, stackTrace) {
@@ -293,7 +293,7 @@ class _BookingsPageState extends State<BookingsPage> with WidgetsBindingObserver
                         ),
                         textAlign: TextAlign.center,
                       ),
-                    ),
+                  ),
                   ],
                 ],
               ),
@@ -748,8 +748,8 @@ class _BookingCardState extends State<_BookingCard> {
                 ),
               ),
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                   // Icon kos
                   Container(
                     padding: const EdgeInsets.all(12),
@@ -771,48 +771,48 @@ class _BookingCardState extends State<_BookingCard> {
                     ),
                   ),
                   const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
                           widget.kos['name']?.toString() ?? 'Kos',
-                          style: GoogleFonts.poppins(
+                        style: GoogleFonts.poppins(
                             fontSize: 20,
-                            fontWeight: FontWeight.w700,
-                            color: const Color(0xFF291C0E),
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xFF291C0E),
                             height: 1.2,
-                          ),
                         ),
+                      ),
                         if (widget.kos['address'] != null && widget.kos['address'].toString().isNotEmpty) ...[
                           const SizedBox(height: 6),
-                          Row(
-                            children: [
-                              Icon(
+                        Row(
+                          children: [
+                            Icon(
                                 Icons.location_on_rounded,
                                 size: 14,
                                 color: const Color(0xFF6E473B).withOpacity(0.7),
-                              ),
-                              const SizedBox(width: 4),
-                              Expanded(
-                                child: Text(
+                            ),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
                                   widget.kos['address']?.toString() ?? '',
-                                  style: GoogleFonts.poppins(
+                                style: GoogleFonts.poppins(
                                     fontSize: 12,
                                     color: const Color(0xFF291C0E).withOpacity(0.7),
                                     fontWeight: FontWeight.w400,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
                                 ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                            ],
-                          ),
-                        ],
+                            ),
+                          ],
+                        ),
                       ],
-                    ),
+                    ],
                   ),
-                  _StatusChip(status: status),
+                ),
+                _StatusChip(status: status),
                 ],
               ),
             ),
@@ -842,11 +842,11 @@ class _BookingCardState extends State<_BookingCard> {
                           color: Colors.purple,
                         ),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
+              ],
+            ),
+            const SizedBox(height: 12),
                   // Periode
-                  Container(
+            Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: Colors.orange.shade50,
@@ -890,7 +890,7 @@ class _BookingCardState extends State<_BookingCard> {
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
                                   color: const Color(0xFF291C0E),
-                                ),
+            ),
                               ),
                             ],
                           ),
@@ -900,7 +900,7 @@ class _BookingCardState extends State<_BookingCard> {
                   ),
                   // Show user info for owner
                   if (widget.isOwner && widget.user.isNotEmpty) ...[
-                    const SizedBox(height: 12),
+            const SizedBox(height: 12),
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
@@ -926,7 +926,7 @@ class _BookingCardState extends State<_BookingCard> {
                                   size: 20,
                                   color: Colors.green.shade700,
                                 ),
-                              ),
+            ),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Column(
@@ -939,7 +939,7 @@ class _BookingCardState extends State<_BookingCard> {
                                         color: Colors.green.shade700,
                                         fontWeight: FontWeight.w500,
                                       ),
-                                    ),
+            ),
                                     const SizedBox(height: 2),
                                     Text(
                                       widget.user['name']?.toString() ?? '-',
@@ -956,17 +956,17 @@ class _BookingCardState extends State<_BookingCard> {
                           ),
                           if (widget.user['phone'] != null && widget.user['phone'].toString().isNotEmpty) ...[
                             const SizedBox(height: 12),
-                            Row(
-                              children: [
-                                Icon(
+              Row(
+                children: [
+                  Icon(
                                   Icons.phone_rounded,
                                   size: 16,
                                   color: Colors.green.shade700,
-                                ),
+                  ),
                                 const SizedBox(width: 8),
-                                Text(
+                  Text(
                                   widget.user['phone']?.toString() ?? '-',
-                                  style: GoogleFonts.poppins(
+                    style: GoogleFonts.poppins(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w500,
                                     color: const Color(0xFF291C0E),
@@ -992,7 +992,7 @@ class _BookingCardState extends State<_BookingCard> {
                             const Color(0xFF6E473B).withOpacity(0.1),
                             const Color(0xFF6E473B).withOpacity(0.05),
                           ],
-                        ),
+                    ),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: const Color(0xFF6E473B).withOpacity(0.2),
@@ -1026,19 +1026,19 @@ class _BookingCardState extends State<_BookingCard> {
                                 ),
                               ),
                             ],
-                          ),
-                          Text(
-                            _formatPrice(totalPrice),
-                            style: GoogleFonts.poppins(
+                  ),
+                  Text(
+                    _formatPrice(totalPrice),
+                    style: GoogleFonts.poppins(
                               fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                              color: const Color(0xFF6E473B),
-                            ),
-                          ),
-                        ],
-                      ),
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF6E473B),
                     ),
-                  ],
+                  ),
+                ],
+              ),
+                    ),
+            ],
                 ],
               ),
             ),
@@ -1050,7 +1050,7 @@ class _BookingCardState extends State<_BookingCard> {
                   // Approve/Reject buttons for owner (only if pending)
                   if (widget.isOwner && status.toLowerCase() == 'pending' && widget.onStatusUpdate != null) ...[
                     Row(
-                      children: [
+              children: [
                         Expanded(
                           child: OutlinedButton.icon(
                             onPressed: _isProcessing ? null : _showRejectDialog,
@@ -1070,12 +1070,12 @@ class _BookingCardState extends State<_BookingCard> {
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 14),
                               side: BorderSide(color: Colors.red.shade400, width: 1.5),
-                              shape: RoundedRectangleBorder(
+                    shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
                             ),
-                          ),
-                        ),
+                    ),
+                  ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: ElevatedButton.icon(
@@ -1116,23 +1116,23 @@ class _BookingCardState extends State<_BookingCard> {
                           color: const Color(0xFF6E473B),
                         ),
                         label: Text(
-                          'Lihat Detail',
-                          style: GoogleFonts.poppins(
+                        'Lihat Detail',
+                        style: GoogleFonts.poppins(
                             fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: const Color(0xFF6E473B),
-                          ),
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF6E473B),
                         ),
+                      ),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           side: BorderSide(color: const Color(0xFF6E473B).withOpacity(0.3)),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
                       ),
-                    ),
-                  ],
+                        ),
+                  ),
+                ),
+              ],
                 ],
               ),
             ),
@@ -1172,21 +1172,21 @@ class _InfoCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            children: [
-              Icon(
-                icon,
+      children: [
+        Icon(
+          icon,
                 size: 16,
                 color: color,
-              ),
-              const SizedBox(width: 6),
-              Text(
+        ),
+        const SizedBox(width: 6),
+        Text(
                 label,
-                style: GoogleFonts.poppins(
+          style: GoogleFonts.poppins(
                   fontSize: 11,
                   color: color,
                   fontWeight: FontWeight.w500,
-                ),
-              ),
+          ),
+        ),
             ],
           ),
           const SizedBox(height: 6),
@@ -1199,8 +1199,8 @@ class _InfoCard extends StatelessWidget {
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-          ),
-        ],
+        ),
+      ],
       ),
     );
   }

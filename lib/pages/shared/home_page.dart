@@ -308,12 +308,12 @@ class _HomePageState extends State<HomePage> {
                             color: Colors.white,
                             onSelected: (value) async {
                               if (value == 'add_kos') {
-                                final result = await Navigator.of(
-                                  context,
-                                ).pushNamed('/add_kos');
-                                if (result == true) {
-                                  _reload();
-                                }
+                final result = await Navigator.of(
+                  context,
+                ).pushNamed('/add_kos');
+                if (result == true) {
+                  _reload();
+                }
                               }
                             },
                             itemBuilder: (context) => [
@@ -328,9 +328,9 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                     const SizedBox(width: 12),
                                     Text(
-                                      'Tambah Kos',
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 14,
+                'Tambah Kos',
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
                                         fontWeight: FontWeight.w500,
                                         color: const Color(0xFF291C0E),
                                       ),
@@ -351,12 +351,12 @@ class _HomePageState extends State<HomePage> {
                             child: Container(
                               width: 40,
                               height: 40,
-                              decoration: BoxDecoration(
+                decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 border: Border.all(
                                   color: Colors.white.withOpacity(0.4),
                                   width: 2,
-                                ),
+                  ),
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.black.withOpacity(0.1),
@@ -377,20 +377,20 @@ class _HomePageState extends State<HomePage> {
                                               color: Colors.white,
                                               size: 20,
                                             ),
-                                      ),
+                ),
                                     )
                                   : const Icon(
                                       Icons.person,
                                       color: Colors.white,
                                       size: 20,
                                     ),
-                            ),
+                ),
                           ),
                         ),
                       ],
-                    ),
-                  ],
-                ),
+              ),
+            ],
+          ),
               ),
             ),
           ),
@@ -460,53 +460,62 @@ class _HomePageState extends State<HomePage> {
 
           // Horizontal Carousel for Daftar Kos
           if (_items.isEmpty && _loading)
-            SliverToBoxAdapter(child: _buildShimmerList())
+            SliverPadding(
+              padding: const EdgeInsets.only(bottom: 100),
+              sliver: SliverToBoxAdapter(child: _buildShimmerList()),
+            )
           else if (_items.isEmpty)
-            SliverToBoxAdapter(child: _emptyState(context))
+            SliverPadding(
+              padding: const EdgeInsets.only(bottom: 100),
+              sliver: SliverToBoxAdapter(child: _emptyState(context)),
+            )
           else
-            SliverToBoxAdapter(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Carousel dengan height lebih tinggi agar perlu scroll sedikit
-                  SizedBox(
-                    height: 420, // Ditinggikan untuk perlu scroll sedikit
-                    child: _CarouselWithEffect(
-                      items: _items,
-                      onTap: (kos) => _navigateToDetail(kos),
-                      onPageChanged: (index) {
-                        setState(() {
-                          _carouselCurrentIndex = index;
-                        });
-                      },
+            SliverPadding(
+              padding: const EdgeInsets.only(bottom: 100),
+              sliver: SliverToBoxAdapter(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Carousel dengan height lebih tinggi agar perlu scroll sedikit
+                    SizedBox(
+                      height: 420, // Ditinggikan untuk perlu scroll sedikit
+                child: _CarouselWithEffect(
+                  items: _items,
+                  onTap: (kos) => _navigateToDetail(kos),
+                        onPageChanged: (index) {
+                          setState(() {
+                            _carouselCurrentIndex = index;
+                          });
+                        },
+                      ),
                     ),
-                  ),
-                  // Indikator lebih ke bawah, tanpa container pembungkus
-                  if (_items.length > 1) ...[
-                    const SizedBox(
-                      height: 20,
-                    ), // Spacing lebih besar antara card dan indikator
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(
-                        _items.length,
-                        (index) => AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                          width: _carouselCurrentIndex == index ? 24 : 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: _carouselCurrentIndex == index
-                                ? const Color(0xFF6E473B)
-                                : const Color(0xFF6E473B).withOpacity(0.3),
-                            borderRadius: BorderRadius.circular(4),
+                    // Indikator lebih ke bawah, tanpa container pembungkus
+                    if (_items.length > 1) ...[
+                      const SizedBox(
+                        height: 20,
+                      ), // Spacing lebih besar antara card dan indikator
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(
+                          _items.length,
+                          (index) => AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            width: _carouselCurrentIndex == index ? 24 : 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: _carouselCurrentIndex == index
+                                  ? const Color(0xFF6E473B)
+                                  : const Color(0xFF6E473B).withOpacity(0.3),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 16), // Spacing bawah sederhana
+                      const SizedBox(height: 16), // Spacing bawah sederhana
+                    ],
                   ],
-                ],
+                ),
               ),
             ),
         ],
@@ -1697,47 +1706,47 @@ class _CarouselWithEffectState extends State<_CarouselWithEffect> {
     return SizedBox(
       height: double.infinity,
       child: Column(
-        children: [
-          Expanded(
-            child: PageView.builder(
-              controller: _pageController,
+      children: [
+        Expanded(
+          child: PageView.builder(
+            controller: _pageController,
               clipBehavior: Clip.none, // Tidak clip shadow
-              onPageChanged: (index) {
-                setState(() {
-                  _currentIndex = index;
-                });
+            onPageChanged: (index) {
+              setState(() {
+                _currentIndex = index;
+              });
                 // Kirim currentIndex ke parent
                 widget.onPageChanged?.call(index);
-              },
-              itemCount: widget.items.length,
-              itemBuilder: (context, index) {
-                final kos = widget.items[index];
-                final isActive = index == _currentIndex;
+            },
+            itemCount: widget.items.length,
+            itemBuilder: (context, index) {
+              final kos = widget.items[index];
+              final isActive = index == _currentIndex;
 
                 return Padding(
                   padding: EdgeInsets.symmetric(
-                    horizontal: isActive ? 8 : 16,
+                  horizontal: isActive ? 8 : 16,
                     vertical:
                         0, // Tidak ada padding vertical yang membatasi shadow
-                  ),
+                ),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
                     curve: Curves.easeInOut,
                     // Hapus margin vertical yang membatasi shadow
-                    child: Transform.scale(
-                      scale: isActive ? 1.0 : 0.9,
-                      child: _HorizontalKosCard(
-                        kos: kos,
-                        isActive: isActive,
-                        onTap: () => widget.onTap(kos),
+                child: Transform.scale(
+                  scale: isActive ? 1.0 : 0.9,
+                  child: _HorizontalKosCard(
+                    kos: kos,
+                    isActive: isActive,
+                    onTap: () => widget.onTap(kos),
                       ),
-                    ),
                   ),
-                );
-              },
+                ),
+              );
+            },
             ),
           ),
-        ],
+      ],
       ),
     );
   }

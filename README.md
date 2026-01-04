@@ -67,12 +67,14 @@ mobile/
 ## Fitur Aplikasi
 
 ### Fitur Umum (Shared)
+
 - **Autentikasi**: Login dan registrasi dengan validasi
 - **Home Page**: Menjelajahi daftar kos dengan filter dan pencarian
 - **Dashboard**: Navigasi utama dengan role-based menu
 - **Profile**: Mengelola profil pengguna dan melihat statistik
 
 ### Fitur Owner
+
 - **Kelola Kos**: Menambah, mengedit, dan menghapus kos
 - **Kelola Kamar**: Menambahkan dan mengelola kamar untuk setiap kos
 - **Kelola Fasilitas**: Menambahkan dan mengelola fasilitas kos
@@ -82,6 +84,7 @@ mobile/
 - **Transaction History**: Riwayat transaksi booking
 
 ### Fitur Society (Penyewa)
+
 - **Pencarian Kos**: Mencari kos berdasarkan filter (harga, lokasi, gender)
 - **Detail Kos**: Melihat detail lengkap kos termasuk kamar, fasilitas, dan review
 - **Booking**: Membuat booking dengan memilih tanggal sewa
@@ -262,6 +265,7 @@ Menu kelola kos yang dapat diakses dari profile Owner.
 ## Cara Menjalankan Proyek
 
 ### Prasyarat
+
 - Flutter SDK (versi terbaru)
 - Dart SDK
 - Android Studio / VS Code dengan Flutter extension
@@ -283,6 +287,7 @@ flutter pub get
 ### 3. Konfigurasi
 
 Pastikan file `lib/config.dart` sudah dikonfigurasi dengan benar:
+
 - `apiHostBase`: URL backend API
 - Pastikan backend sudah berjalan dan dapat diakses
 
@@ -307,16 +312,14 @@ flutter build ios --release
 
 ## Teknologi yang Digunakan
 
-- **Frontend**: 
+- **Frontend**:
   - Flutter
   - Dart
   - Provider (State Management)
-  
-- **Backend**: 
+- **Backend**:
   - Laravel (PHP)
   - MySQL Database
   - Laravel Sanctum (Authentication)
-  
 - **Libraries**:
   - Dio (HTTP Client)
   - SharedPreferences (Local Storage)
@@ -328,6 +331,7 @@ flutter build ios --release
 Aplikasi ini menggunakan RESTful API yang dihosting di backend Laravel. Dokumentasi lengkap API dapat dilihat di `API_DOCUMENTATION.md` di root project.
 
 ### Endpoint Utama:
+
 - `/api/auth/login` - Login pengguna
 - `/api/auth/register` - Registrasi pengguna
 - `/api/kos` - Daftar kos (Society)
@@ -339,6 +343,7 @@ Aplikasi ini menggunakan RESTful API yang dihosting di backend Laravel. Dokument
 ## Struktur Backend
 
 Backend menggunakan Laravel dengan struktur:
+
 - API routes terpisah untuk Owner dan Society
 - Middleware untuk authentication dan authorization
 - Model relationships untuk data kos, booking, dan review

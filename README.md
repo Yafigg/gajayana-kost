@@ -97,19 +97,37 @@ mobile/
 <details>
 <summary><strong>1. Autentikasi</strong> (klik untuk melihat)</summary>
 
-#### 1.1 Registrasi
+#### 1.1 Splash Screen
+
+![Splash Screen](./assets/image_documentation/splashscreen.png)
+
+Halaman splash screen yang ditampilkan saat aplikasi pertama kali dibuka.
+
+#### 1.2 Login
+
+![Login](./assets/image_documentation/login.png)
+
+Halaman login untuk masuk ke aplikasi dengan email dan password.
+
+#### 1.3 Validasi Login
+
+![Validasi Login](./assets/image_documentation/login_validation.png)
+
+Pesan error validasi yang muncul jika email atau password tidak valid.
+
+#### 1.4 Registrasi
 
 ![Registrasi](./assets/image_documentation/register.png)
 
 Form registrasi dengan validasi untuk membuat akun baru dengan role Owner atau Society.
 
-#### 1.2 Validasi Registrasi
+#### 1.5 Validasi Registrasi
 
 ![Validasi Registrasi](./assets/image_documentation/register_validation.png)
 
 Pesan error validasi yang muncul jika ada field yang tidak valid.
 
-#### 1.3 Registrasi Berhasil
+#### 1.6 Registrasi Berhasil
 
 ![Registrasi Berhasil](./assets/image_documentation/register_succes.png)
 
